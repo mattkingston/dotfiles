@@ -48,6 +48,13 @@
             git commit --amend -m \"$(git log -1 --pretty=%B)\n\nClose #$1\"; \
         fi \
     }; f"
+    
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    initproxy = "!f() { \
+        git init; \
+        git config http.proxy \"$ALL_PROXY\"; \
+    }; f"
 
 [color "branch"]
 
