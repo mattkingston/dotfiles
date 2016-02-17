@@ -53,7 +53,16 @@
     
     initproxy = "!f() { \
         git init; \
+        git config http.proxy \"$ALL_PROXY\";
+    }; f"
+    
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    initgithub = "!f() { \
+        git init; \
         git config http.proxy \"$ALL_PROXY\"; \
+        git config user.name \"$GITHUB_NAME\"; \
+        git config user.email \"$GITHUB_EMAIL\"; \
     }; f"
 
 [color "branch"]
