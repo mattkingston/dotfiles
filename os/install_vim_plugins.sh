@@ -27,8 +27,6 @@ install_vim_plugins() {
         #        the case where there are warnings
     print_result $? 'Install Vim plugins'
 
-    printf '\n'
-
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # In the case of fresh installs, in order for `npm` to be

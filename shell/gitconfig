@@ -53,7 +53,7 @@
     
     initproxy = "!f() { \
         git init; \
-        git config http.proxy \"$ALL_PROXY\";
+        git config http.proxy \"$ALL_PROXY\"; \
     }; f"
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
