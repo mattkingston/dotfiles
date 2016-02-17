@@ -1,22 +1,25 @@
 
-Set up needs to be run through the [dotfiles installer](https://github.com/mattkingston/dotfiles-installer)
-
---
-
-# Base dotfiles
+# Dotfiles
 
 ### What is it?
 
 A collection of starter dotfiles for OS level settings and applications.
 
-### Install actions
+## Usage
 
-This dotfiles collection follows the same install process of other collections in that it;
+To setup the dotfiles just run the appropriate snippet in the terminal:
+
+| OS | Snippet |
+|:---:|:---|
+| OS X | `bash -c "$(curl -LsS https://raw.github.com/mattkingston/dotfiles/master/install)"` |
+| Ubuntu | `bash -c "$(wget -qO - https://raw.github.com/mattkingston/dotfiles/master/install)"` |
+
+### Install actions
 
 1. Checks for suitable OS versions (Ubuntu >= 14.04 or OSX >= 10.9)
 1. Downloads the dotfiles on your computer
-1. Asks where to install the base dotfiles project (by default it will suggest
-  `~/projects/dotfiles-base`)
+1. Asks where to install the dotfiles project (by default it will suggest
+  `~/projects/dotfiles`)
 1. Creates some additional [directories](os/create_directories.sh)
 1. [Symlink](os/create_symbolic_links.sh)s the
   [git](git),
