@@ -1,0 +1,353 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Variables
+
+declare -r origin="git@github.com:mattkingston/dotfiles-base.git"
+
+if [[ -d "$(dirname $BASH_SOURCE)/os" ]]; then
+    declare -r tarballUrl="$(dirname $BASH_SOURCE)"
+else
+    declare -r tarballUrl="http://github.com/mattkingston/dotfiles-base/tarball/master"
+fi
+
+if [[ -d "$(dirname $BASH_SOURCE)/os" ]]; then
+    declare -r installDir="$(dirname $BASH_SOURCE)"
+    declare extracted=1
+else
+    declare -r installDir="$HOME/projects/dotfiles"
+    declare extracted=0
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Definitions
+
+is_http() {
+    local url="$1"
+
+    [[ "$url" == "http"* ]] \
+        && return 0
+
+    return 1
+}
+
+is_archive() {
+    local file="$1"
+
+    [[ -f "$file" && "$file" == *".tar"* ]] \
+        && return 0
+
+    return 1
+}
+
+get_os() {
+    local osName="$(uname -s)"
+    local os=''
+
+    if [ "$osName" == "Darwin" ]; then
+        os='osx'
+    elif [ "$osName" == "Linux" ] && [ -e "/etc/lsb-release" ]; then
+        os='ubuntu'
+    else
+        os="$osName"
+    fi
+
+    printf "%s" "$os"
+}
+
+download() {
+    local url="$1"
+    local archive="$2"
+
+    if command -v 'curl' &> /dev/null; then
+        curl -LksSo "$archive" "$url" &> /dev/null
+
+        return $?
+    elif command -v 'wget' &> /dev/null; then
+        wget -qO "$archive" "$url" &> /dev/null
+        return $?
+    fi
+
+    return 1
+}
+
+extract() {
+    local archive="$1"
+    local outputDir="$2"
+
+    if command -v 'tar' &> /dev/null; then
+        tar -zxf "$archive" --strip-components 1 -C "$outputDir"
+        return $?
+    fi
+
+    return 1
+}
+
+download_and_extract() {
+    local url="$1"
+    local tmpFile="$2"
+    local tmpDir="$3"
+
+    if is_http "$url"; then
+        if download "$url" "$tmpFile"; then
+            if extract "$tmpFile" "$tmpDir"; then
+                return 0
+            fi
+        fi
+    else
+        if is_archive "$url"; then
+            cp "$url" "$tmpFile"
+
+            if extract "$tmpFile" "$tmpDir"; then
+                return 0
+            fi
+        elif [[ -d "$url" ]]; then
+            if cp -r "$url/." "$tmpDir/"; then
+                return 0
+            fi
+        fi
+    fi
+
+    return 1
+}
+
+main() {
+
+    declare workingDirectory="$(pwd)" \
+        && cd "$(dirname $BASH_SOURCE)"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    local tmpFile="$(mktemp /tmp/XXXXX)"
+    local tmpDir="$(mktemp -d /tmp/XXXXX)"
+
+    local newInstallDir="$installDir"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Download dotfiles to a temporary location
+
+    if [[ "$extracted" -eq 1 ]]; then
+        source "$installDir/shell/bash_utils"
+    else
+        download_and_extract "$tarballUrl" "$tmpFile" "$tmpDir"
+        source "$tmpDir/shell/bash_utils"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    verify_os || exit 1
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    ask_for_sudo
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    echo "$installDir"
+       
+    if [[ "$extracted" -eq 1 ]]; then
+        # The tarball has been downloaded and extracted already
+        
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        cd "$installDir"
+        
+    else
+		
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+		# Ask where to store the dotfiles binaries
+
+		ask_for_confirmation "Do you want to store the base dotfiles in '$newInstallDir'?"
+
+		if ! answer_is_yes; then
+			newInstallDir=''
+
+			while [[ -z "$newInstallDir" ]]; do
+				ask 'Please specify another location for the base dotfiles (absolute path): '
+
+				newInstallDir="$(get_answer)"
+			done
+		fi
+
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+		# Request overwrite of the directory
+
+		while [[ -e "$newInstallDir" ]]; do
+			ask_for_confirmation "'$newInstallDir' already exists, do you want to overwrite it?"
+
+			if answer_is_yes; then
+				rm -rf "$newInstallDir"
+				break
+			else
+				newInstallDir=''
+
+				while [[ -z "$newInstallDir" ]]; do
+					ask 'Please specify another location for the base dotfiles (absolute path): '
+
+					newInstallDir="$(get_answer)"
+
+					if [[ -z "$newInstallDir" ]]; then
+						newInstallDir="$installDir"
+					fi
+				done
+
+			fi
+		done
+
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+		# Move the downloaded dotfiles to the selected directory
+
+		if [[ ! -e "$newInstallDir" ]]; then
+			mkdir -p "$(dirname $newInstallDir)"
+
+			mv "$tmpDir" "$newInstallDir"
+
+			print_result $? "Create '$newInstallDir'"
+		fi
+
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+		# Remove archive
+
+		rm -rf "$tmpFile"
+
+		print_result  $? "Remove archive $(print_in_grey "($tmpFile)")"
+		
+		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        cd "$newInstallDir"
+		
+	fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Create directories'
+
+    ask_for_confirmation 'Do you want the additional directories to be created?'
+
+    if answer_is_yes; then
+        source ./os/create_directories.sh
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Create symbolic links'
+
+    ask_for_confirmation 'Do you want to create dotfile symlinks?'
+
+    if answer_is_yes; then
+        source ./os/create_symbolic_links.sh
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    source "$HOME/.bash_profile"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Install applications'
+
+    ask_for_confirmation 'Do you want to install the applications/command line tools?'
+
+    if answer_is_yes; then
+        source ./os/install_applications.sh
+        source ./os/install_node_versions.sh
+        source ./os/install_npm_packages.sh
+        source ./os/install_ruby_versions.sh
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Set preferences'
+
+    ask_for_confirmation 'Do you want to set the custom preferences?'
+
+    if answer_is_yes; then
+        source ./os/set_preferences.sh
+    fi
+    
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    
+    if cmd_exists 'git'; then
+        if [[ "$(git config --get remote.origin.url)" != "$origin" ]]; then
+            print_info 'Initialize Git repository'
+
+            source ./os/initialize_git_repository.sh "$origin"
+        fi
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        if is_git_repository; then
+            ssh -T git@github.com &> /dev/null
+
+            if [[ $? -ne 1 ]]; then
+                print_info 'Set up Github SSH keys'
+
+                ask_for_confirmation 'Do you want to set up Github SSH keys?'
+
+                if answer_is_yes; then
+                    source ./os/setup_github_ssh_keys.sh
+
+                    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+                    print_info 'Update content'
+
+                    ask_for_confirmation 'Do you want to update the content from the "dotfiles" directory?'
+
+                    if answer_is_yes; then
+                        echo "Update content"
+                        #source ./os/update_content.sh
+                    fi
+                fi
+            fi
+        fi
+
+    fi
+
+    cd "$(dirname "$BASH_SOURCE")"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    if cmd_exists 'vim'; then
+        print_info 'Install/Update Vim plugins'
+
+        ask_for_confirmation 'Do you want to install/update the Vim plugins?'
+
+        if answer_is_yes; then
+            source ./os/install_vim_plugins.sh
+        fi
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Restart'
+
+    ask_for_confirmation 'Do you want to restart?'
+
+    if answer_is_yes; then
+        source ./os/restart.sh
+    else
+        print_success "Provisioning complete\n"
+    fi
+
+    cd "$workingDirectory"
+
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Main
+
+main
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Cleanup
+
+unset main

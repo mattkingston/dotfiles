@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Definitions
+
+bash_extra() {
+    for f in $HOME/*.bash_extra_*; do
+        [ -r "$f" ] && source "$f"
+    done
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Main
+
+bash_extra
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Cleanup
+
+unset bash_extra
+
+

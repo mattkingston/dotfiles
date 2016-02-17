@@ -1,0 +1,580 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# OS Definitions
+
+get_os() {
+    declare osName="$(uname -s)"
+    declare os=''
+
+    if [ "$osName" == "Darwin" ]; then
+        os='osx'
+    elif [ "$osName" == "Linux" ] && [ -e "/etc/lsb-release" ]; then
+        os='ubuntu'
+    else
+        os="$osName"
+    fi
+
+    printf "%s" "$os"
+}
+
+is_supported_version() {
+    declare -a v1=(${1//./ })
+    declare -a v2=(${2//./ })
+
+    declare i=''
+
+    # Fill empty positions in v1 with zeros
+    for (( i=${#v1[@]}; i<${#v2[@]}; i++ )); do
+        v1[i]=0
+    done
+
+    for (( i=0; i<${#v1[@]}; i++ )); do
+
+        # Fill empty positions in v2 with zeros
+        if [[ -z ${v2[i]} ]]; then
+            v2[i]=0
+        fi
+
+        if (( 10#${v1[i]} < 10#${v2[i]} )); then
+            return 1
+        fi
+
+    done
+}
+
+verify_os() {
+    declare -r minOSXVersion='10.9'
+    declare -r minUbuntuVersion='14.04'
+    declare -r osName="$(uname -s)"
+
+    declare osVersion=''
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `OS X` and
+    # it's above the required version
+
+    if [[ "$os" == 'osx' ]]; then
+        osVersion="$(sw_vers -productVersion)"
+
+        is_supported_version "$osVersion" "$minOSXVersion" \
+            && return 0 \
+            || printf "Sorry, this script is intended only for OS X $minOSXVersion+"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `Ubuntu` and
+    # it's above the required version
+
+    elif [[ "$os" == 'ubuntu' ]]; then
+        osVersion="$(lsb_release -d | cut -f2 | cut -d' ' -f2)"
+
+        is_supported_version "$osVersion" "$minUbuntuVersion" \
+            && return 0 \
+            || printf "Sorry, this script is intended only for Ubuntu $minUbuntuVersion+"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    else
+        printf 'Sorry, this script is intended only for OS X and Ubuntu!'
+    fi
+
+    return 1
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# OS Dependent Definitions
+
+if [[ -z "$os" ]]; then
+    declare os="$(get_os)"
+fi
+
+if [[ "$os" == 'osx' ]]; then
+
+    # - - - - - - - - - - -
+
+    # OS X Definitions
+
+    install_package() {
+        declare -r CMD="$3"
+        declare -r FORMULA="$2"
+        declare -r FORMULA_READABLE_NAME="$1"
+
+        if brew "$CMD" list "$FORMULA" &> /dev/null; then
+            print_success "$FORMULA_READABLE_NAME"
+        else
+            execute "brew $CMD install $FORMULA" "$FORMULA_READABLE_NAME"
+        fi
+    }
+
+    add_to_source_list() {
+        declare -r REPOSITORY="$1"
+
+        brew tap "$REPOSITORY" &> /dev/null
+        print_result $? "brew tap $REPOSITORY\n"
+
+        return $?
+    }
+
+    package_is_installed() {
+        if cmd_exists 'brew'; then
+            brew list "$1" \
+                && return 0 \
+                || return 1;
+        fi
+
+        return 1;
+    }
+
+    update() {
+        # System software update tool
+        # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/softwareupdate.8.html
+
+        execute 'sudo softwareupdate --install --all' 'Update system software'
+
+        if cmd_exists 'brew'; then
+            execute 'brew update' 'brew (update)'
+        fi
+    }
+
+    upgrade() {
+        if cmd_exists 'brew'; then
+            execute 'brew upgrade --all' 'brew (upgrade)'
+        fi
+    }
+
+    update_and_upgrade() {
+        if cmd_exists 'brew'; then
+            execute 'brew update' 'brew (update)'
+            execute 'brew upgrade --all' 'brew (upgrade)'
+        fi
+    }
+
+elif [[ "$os" == 'ubuntu' ]]; then
+
+    # - - - - - - - - - - -
+
+    # Ubuntu Definitions
+
+    add_key() {
+        wget -qO - "$1" | sudo apt-key add -
+        #     │└─ write output to file
+        #     └─ don't show output
+    }
+
+    accept_key() {
+        local keyserver="$1"
+        local keys="$2"
+
+        execute "sudo apt-key adv --keyserver $keyserver --recv-keys $keys"
+    }
+
+    add_all_sources_keys() {
+        awk -F/ '/^[[:blank:]]*deb[[:blank:]]+http:\/\/ppa\.launchpad\.net\// {print "https://launchpad.net/~"$4"/+archive"}' \
+          /etc/apt/sources.list{,.d/*.list} | \
+          xargs -- wget -q -O- | \
+          awk -F\" '/http:\/\/keyserver\.ubuntu\.com:11371/ {sub(/amp;op=index/,"op=get");print $2}' | \
+          xargs -- wget -q -O- | sudo apt-key add -
+    }
+
+    add_ppa() {
+        sudo add-apt-repository -y ppa:"$1"
+    }
+
+    add_to_source_list() {
+        sudo sh -c "printf 'deb $1' >> '/etc/apt/sources.list.d/$2'"
+    }
+
+    install_package() {
+        declare -r PACKAGE="$2"
+        declare -r PACKAGE_READABLE_NAME="$1"
+
+        if ! package_is_installed "$PACKAGE"; then
+            print_subtle "Installing: $PACKAGE_READABLE_NAME"
+
+            execute "sudo apt-get install --allow-unauthenticated -y $PACKAGE" "$PACKAGE_READABLE_NAME"
+            #                                      suppress output ─┘│
+            #            assume "yes" as the answer to all prompts ──┘
+        else
+            print_success "$PACKAGE_READABLE_NAME"
+        fi
+    }
+
+    package_is_installed() {
+        dpkg -s "$1"
+    }
+
+    update() {
+        print_subtle "Updating: please stand by this could take a while"
+
+        # Resynchronize the package index files from their sources
+        execute 'sudo apt-get update -y' 'Update'
+    }
+
+    upgrade() {
+        print_subtle "Upgrading: please stand by this could take a while"
+
+        # Install the newest versions of all packages installed
+        execute 'sudo apt-get upgrade -y' 'Upgrade'
+    }
+
+    update_and_upgrade() {
+        update
+        upgrade
+    }
+
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# System Definitions
+
+ask_for_sudo() {
+    # Ask for the administrator password upfront
+    sudo -v &> /dev/null
+
+    # Update existing `sudo` time stamp until this script has finished
+    # https://gist.github.com/cowboy/3118588
+    while true; do
+        sudo -n true
+        sleep 60
+        kill -0 "$$" || exit
+    done &> /dev/null &
+}
+
+can_sudo() {
+    [[ “$(whoami)“ != "root" && ! is_interactive ]] \
+        && return 0 \
+        || return 1;
+}
+
+cmd_exists() {
+    command -v "$1" > /dev/null 2>&1
+    return $?
+}
+
+execute() {
+    eval "$1"
+    print_result $? "${2:-$1}"
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Arguments Definitions
+
+has_argument() { # bool : true (0) | false (1)
+    local -r argumentList=$1
+    local -r argumentName="$2"
+
+    for i in ${argumentList[@]}; do
+        [[ "$i" == "$argumentName" ]] \
+            && return 0
+    done
+
+    return 1
+}
+
+get_prefixed_argument() { # string
+    local -r argumentList=$1
+    local -r argumentPrefix="$2"
+
+    for i in ${argumentList[@]}; do
+        [[ ${argumentList[$i]} =~ ^$argumentPrefix ]] \
+            && "$(echo ${argumentList[$i]} | sed s/$argumentPrefix//)"
+    done
+}
+
+get_next_argument() { # string
+    local -r argumentList=$1
+    local -r argumentName="$2"
+    local -r argumentListLength="${#argumentList}"
+
+    for (( i=0; i < ${argumentListLength}; i++ )); do
+        [[ "$i" == "$argumentName" && $i+1 -le "$argumentListLength" ]] \
+            && return ${argumentList[$i+1]};
+    done
+}
+
+get_argument_at() { # string
+    local -r argumentList=$1
+    local -r argumentIndex="$2"
+
+    [[ -z ${argumentList[$argumentIndex]} ]] \
+        && return ${argumentList[$argumentIndex]}
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# File System Definitions
+
+su_mkd() {
+    if [[ -n "$1" ]]; then
+        if [[ -e "$1" ]]; then
+            if [[ ! -d "$1" ]]; then
+                print_error "$1 - a file with the same name already exists!"
+            else
+                print_success "$1"
+            fi
+        else
+            execute "sudo mkdir -p $1" "$1"
+        fi
+    fi
+}
+
+mkd() {
+    if [[ -n "$1" ]]; then
+        if [[ -e "$1" ]]; then
+            if [[ ! -d "$1" ]]; then
+                print_error "$1 - a file with the same name already exists!"
+            else
+                print_success "$1"
+            fi
+        else
+            execute "mkdir -p $1" "$1"
+        fi
+    fi
+}
+
+extract() {
+    local archive="$1"
+    local output_dir="$2"
+
+    # Extract the contents of a zip file (gzipped donest matter when extracting)
+    if command -v 'tar' &> /dev/null; then
+        tar -zxf "$archive" --strip-components 1 -C "$output_dir"
+        return $?
+    fi
+
+    return 1
+}
+
+extract_into() {
+    local current_dir="$(pwd)"
+    local archive="$1"
+    local output_dir="$($2 || pwd)"
+
+    # Move into the directory we want to extract into
+    cd "$output_dir"
+
+    # Extract the contents of a zip file (gzipped donest matter when extracting)
+    if command -v 'tar' &> /dev/null; then
+        tar -zxf "$archive" "$archive"
+        return $?
+    fi
+
+    cd "$current_dir"
+}
+
+chown_r() {
+    chown -R "$(whoami)":"$(whoami)" $1
+
+    print_success "changed owner: $(whoami) $1"
+}
+
+append_to_file() {
+    local -r file="$1"
+    local -r content="$2"
+
+    echo "$content" >> "$file"
+
+    print_success "Append: $file"
+}
+
+append_to_file_once() {
+    local -r file="$1"
+    local -r content="$2"
+
+    if ! grep -Fq "$content" "$file"; then
+        echo "$content" >> "$file"
+    fi
+
+    print_success "Append: $file"
+}
+
+append_to_file_at_line_once() {
+    local -r file="$1"
+    local -r content="$2"
+    local -r line="$3"
+
+    if ! grep -Fq "$content" "$file"; then
+      sed -i "$LINEi\n$content\n" "$file"
+
+      print_success "Insert: $file:$line"
+    fi
+}
+
+remove_from_file() {
+    local -r file="$1"
+    local -r content="$2"
+
+    if grep -Fq "$content" "$file"; then
+        sed -i "s/$content//" "$file"
+    fi
+}
+
+content_in_file() {
+    local -r file="$2"
+    local -r search="$1"
+
+    grep -Fq "$search" "$file" && return 0 || return 1
+}
+
+add_source_to_profile() {
+    local newInstallDir="$1"
+    local bashrcSource="$2"
+
+    if [[ ! -f "$HOME/.profile" ]]; then
+        cat > "$HOME/.profile"
+        print_success "create $HOME/.profile\n"
+    fi
+
+    local content="\n[[ -e $newInstallDir/$bashrcSource ]] \
+    && source $newInstallDir/$bashrcSource\n"
+
+    append_to_file_once "$HOME/.profile" "$content"
+
+    return $?
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# VCS Definitions
+
+is_git_repository() {
+    git rev-parse &> /dev/null
+    return $?
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# IO Definitions
+
+is_interactive() {
+    [[ -t "0" || ( -t "0" || -p /dev/stdin ) ]] \
+        && return 0 \
+        || return 1;
+}
+
+is_yes() {
+    [[ "$1" =~ ^[Yy]es$ || "$1" =~ ^[Yy]$ ]] \
+        && return 0 \
+        || return 1
+}
+
+is_no() {
+    [[ "$1" =~ ^[Nn]o?$ ]] \
+        && return 0 \
+        || return 1
+}
+
+ask() {
+    print_question "$1"
+    read
+}
+
+ask_for_confirmation() {
+    print_question "$1"
+
+    while read -r -s -n 1; do
+        # if the answer is null or “y” or “n” (not case sensitive)
+        # we can accept the answer. All other letters are ignored
+
+        if [[ -z "$REPLY" ]] || ([[ -n "$REPLY" ]] && (is_yes "$REPLY" || is_no "$REPLY")); then
+            printf "$REPLY"
+            break
+        fi
+    done
+
+    printf "\n"
+}
+
+answer_is_null() {
+    [[ -z "$REPLY" ]] \
+        && return 0 \
+        || return 1
+}
+
+answer_is_yes() {
+    is_yes "$REPLY" \
+        && return 0 \
+        || return 1
+}
+
+get_answer() {
+    printf "$REPLY"
+}
+
+print_in_green() {
+    printf "\e[38;5;82m$1\e[0m"
+}
+
+print_in_purple() {
+    printf "\e[38;5;165m$1\e[0m"
+}
+
+print_in_orange() {
+    printf "\e[38;5;136m$1\e[0m"
+}
+
+print_in_red() {
+    printf "\e[38;5;196m$1\e[0m"
+}
+
+print_in_blue() {
+    printf "\e[38;5;75m$1\e[0m"
+}
+
+print_in_yellow() {
+    printf "\e[38;5;226m$1\e[0m"
+}
+
+print_in_grey() {
+    printf "\e[38;5;240m$1\e[0m"
+}
+
+print_in_white() {
+    printf "\e[38;5;255m$1\e[0m"
+}
+
+print_lf() {
+    printf "\n"
+}
+
+print_break() {
+    printf "\n -----\n\n"
+}
+
+print_info() {
+    print_in_purple "\n      $1\n"
+}
+
+print_subtle() {
+    print_in_grey "      $1\n"
+}
+
+print_question() {
+    print_in_blue "\n  [?] $1 "
+}
+
+print_success() {
+    print_in_green "\n  [✔] $1\n"
+}
+
+print_notice() {
+    print_in_yellow "  [!] $1\n"
+}
+
+print_error() {
+    print_in_red "\n  [✖] $1 $2\n"
+}
+
+print_result() {
+    [[ "$1" -eq 0 ]] \
+        && print_success "$2" \
+        || print_error "${3:-$2}";
+
+    return $1
+}
