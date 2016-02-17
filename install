@@ -156,74 +156,74 @@ main() {
         cd "$installDir"
         
     else
-		
-		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		# Ask where to store the dotfiles binaries
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		ask_for_confirmation "Do you want to store the base dotfiles in '$newInstallDir'?"
+        # Ask where to store the dotfiles binaries
 
-		if ! answer_is_yes; then
-			newInstallDir=''
+        ask_for_confirmation "Do you want to store the base dotfiles in '$newInstallDir'?"
 
-			while [[ -z "$newInstallDir" ]]; do
-				ask 'Please specify another location for the base dotfiles (absolute path): '
+        if ! answer_is_yes; then
+          newInstallDir=''
 
-				newInstallDir="$(get_answer)"
-			done
-		fi
+          while [[ -z "$newInstallDir" ]]; do
+            ask 'Please specify another location for the base dotfiles (absolute path): '
 
-		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            newInstallDir="$(get_answer)"
+          done
+        fi
 
-		# Request overwrite of the directory
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		while [[ -e "$newInstallDir" ]]; do
-			ask_for_confirmation "'$newInstallDir' already exists, do you want to overwrite it?"
+        # Request overwrite of the directory
 
-			if answer_is_yes; then
-				rm -rf "$newInstallDir"
-				break
-			else
-				newInstallDir=''
+        while [[ -e "$newInstallDir" ]]; do
+          ask_for_confirmation "'$newInstallDir' already exists, do you want to overwrite it?"
 
-				while [[ -z "$newInstallDir" ]]; do
-					ask 'Please specify another location for the base dotfiles (absolute path): '
+          if answer_is_yes; then
+            rm -rf "$newInstallDir"
+            break
+          else
+            newInstallDir=''
 
-					newInstallDir="$(get_answer)"
+            while [[ -z "$newInstallDir" ]]; do
+              ask 'Please specify another location for the base dotfiles (absolute path): '
 
-					if [[ -z "$newInstallDir" ]]; then
-						newInstallDir="$installDir"
-					fi
-				done
+              newInstallDir="$(get_answer)"
 
-			fi
-		done
+              if [[ -z "$newInstallDir" ]]; then
+                newInstallDir="$installDir"
+              fi
+            done
 
-		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          fi
+        done
 
-		# Move the downloaded dotfiles to the selected directory
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		if [[ ! -e "$newInstallDir" ]]; then
-			mkdir -p "$(dirname $newInstallDir)"
+        # Move the downloaded dotfiles to the selected directory
 
-			mv "$tmpDir" "$newInstallDir"
+        if [[ ! -e "$newInstallDir" ]]; then
+          mkdir -p "$(dirname $newInstallDir)"
 
-			print_result $? "Create '$newInstallDir'"
-		fi
+          mv "$tmpDir" "$newInstallDir"
 
-		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+          print_result $? "Create '$newInstallDir'"
+        fi
 
-		# Remove archive
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-		rm -rf "$tmpFile"
+        # Remove archive
 
-		print_result  $? "Remove archive $(print_in_grey "($tmpFile)")"
-		
-		# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        rm -rf "$tmpFile"
 
-        cd "$newInstallDir"
-		
-	fi
+        print_result  $? "Remove archive $(print_in_grey "($tmpFile)")"
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+            cd "$newInstallDir"
+
+    fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -322,6 +322,116 @@ main() {
         if answer_is_yes; then
             source ./os/install_vim_plugins.sh
         fi
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'GitHub'
+
+    ask_for_confirmation 'Do you want to set up GitHub credentials now?'
+
+    if answer_is_yes; then
+        while [[ -z "$githubName" ]]; do
+            ask 'Please enter your name (not user name)'
+            $githubName="$(get_answer)"
+        done
+
+        while [[ -z "$githubUsername" ]]; do
+            ask 'Please enter your GitHub username'
+            $githubUsername="$(get_answer)"
+        done
+
+        while [[ -z "$githubEmail" ]]; do
+            ask 'Please enter your GitHub email'
+            $githubEmail="$(get_answer)"
+        done
+
+        local GITHUB_CONFIGS='
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        # GitHub
+
+        export GITHUB_USERNAME="'$githubUsername'"
+        export GITHUB_NAME="'$githubName'"
+        export GITHUB_EMAIL="'$githubEmail'"
+
+        ' # END declare=GITHUB_CONFIGS
+
+        append_to_file_once "$HOME/.bash.local" "$GITHUB_CONFIGS"
+
+        print_in_white "GitHub variables have been set in ~/.bash.local\n You can change this any time by modifying this file"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    print_info 'Proxy'
+
+    ask_for_confirmation 'Do you want to set up Proxy details now?'
+
+    if answer_is_yes; then
+        ask 'Please enter your proxy username'
+        $proxyUser="$(get_answer)"
+
+        ask_silent 'Please enter your proxy password'
+        $proxyPass="$(get_answer)"
+
+        while [[ -z "$proxyDomain" ]]; do
+            ask 'Please enter the proxy domain/IP'
+            $proxyDomain="$(get_answer)"
+        done
+
+        ask 'Please enter the proxy port'
+        $proxyPort="$(get_answer)"
+
+        local proxyUserPass=""
+
+        if [ -n $proxyUser ]; then
+            if [ -n $proxyPass ]; then
+                proxyUserPass="$proxyUser:$proxyPass@"
+            else
+                proxyUserPass="$proxyUser@"
+            fi
+        fi
+
+        local proxyUrl="$proxyDomain"
+
+        if [ -n $proxyPort ]; then
+            proxyUrl="$proxyUrl:$proxyPort"
+        fi
+
+        httpProxy="http://$proxyUserPass$proxyUrl"
+        httpsProxy="http://$proxyUserPass$proxyUrl"
+        allProxy="http://$proxyUserPass$proxyUrl"
+
+        ask_for_confirmation "Proxy variables are:\n\HTTP_PROXY=$httpProxy\nHTTPS_PROXY=$https_proxy\nALL_PROXY=$allProxy\nAre these correct?"
+
+        if answer_is_yes; then
+
+        else
+            ask 'Please enter the HTTP proxy'
+            $httpProxy="$(get_answer)"
+
+            ask 'Please enter the HTTPS proxy'
+            $httpsProxy="$(get_answer)"
+
+            ask 'Please enter the ALL proxy'
+            $allProxy="$(get_answer)"
+        fi
+
+        local PROXY_CONFIGS='
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        # Proxy
+
+        export HTTP_PROXY="'$httpProxy'"
+        export HTTPS_PROXY="'$httpsProxy'"
+        export ALL_PROXY="'$allProxy'"
+
+        ' # END declare=PROXY_CONFIGS
+
+        append_to_file_once "$HOME/.bash.local" "$PROXY_CONFIGS"
+
+        print_in_white "Proxy variables have been set in ~/.bash.local\n You can change this any time by modifying this file"
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

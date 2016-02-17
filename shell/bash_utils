@@ -475,6 +475,11 @@ ask() {
     read
 }
 
+ask_silent() {
+    print_question "$1"
+    read -s
+}
+
 ask_for_confirmation() {
     print_question "$1"
 
