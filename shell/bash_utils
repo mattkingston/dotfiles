@@ -46,7 +46,7 @@ is_supported_version() {
 
 verify_os() {
     declare -r minOSXVersion='10.9'
-    declare -r minUbuntuVersion='14.04'
+    declare -r minUbuntuVersion='12.04'
     declare -r osName="$(uname -s)"
 
     declare osVersion=''

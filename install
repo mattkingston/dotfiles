@@ -4,17 +4,17 @@
 
 # Variables
 
-declare -r origin="git@github.com:mattkingston/dotfiles-base.git"
+declare -r origin="git@github.com:mattkingston/dotfiles.git"
 
 if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
     declare -r tarballUrl="$(dirname $BASH_SOURCE[0])"
 else
-    declare -r tarballUrl="http://github.com/mattkingston/dotfiles-base/tarball/master"
+    declare -r tarballUrl="http://github.com/mattkingston/dotfiles/tarball/master"
 fi
 
 if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
-    declare -r installDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    declare extracted=1
+   declare -r installDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+   declare extracted=1
 else
     declare -r installDir="$HOME/projects/dotfiles"
     declare extracted=0
@@ -66,7 +66,7 @@ download() {
 
         return $?
     elif command -v 'wget' &> /dev/null; then
-        wget -qO "$archive" "$url" &> /dev/null
+        wget --no-check-certificate -qO "$archive" "$url" &> /dev/null
         return $?
     fi
 
