@@ -12,7 +12,7 @@ main() {
     )
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     source ./set_chrome_preferences.sh
     source ./set_chrome_canary_preferences.sh

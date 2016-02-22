@@ -24,7 +24,7 @@ declare -r -a NPM_PACKAGES=(
 install_npm_packages() {
 
 	local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # Check if `NVM_DIR` is set, and if it's not, it's because
     # `~/.bash.local` was not sourced and therefore, npm won't

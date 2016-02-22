@@ -16,7 +16,7 @@ declare -a DIRECTORIES=(
 create_directories() {
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     

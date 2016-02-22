@@ -12,7 +12,7 @@ To setup the dotfiles just run the appropriate snippet in the terminal:
 | OS | Snippet |
 |:---:|:---|
 | OS X | `bash -c "$(curl -LsS https://raw.github.com/mattkingston/dotfiles/master/install)"` |
-| Ubuntu | `bash -c "$(wget -qO - https://raw.github.com/mattkingston/dotfiles/master/install)"` |
+| Ubuntu | `bash -c "$(wget --no-check-certificate -qO - https://raw.github.com/mattkingston/dotfiles/master/install)"` |
 
 ### Install actions
 

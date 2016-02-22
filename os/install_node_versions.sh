@@ -15,7 +15,7 @@ declare -r -a NODE_VERSIONS=(
 install_node_versions() {
 
 	local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     declare -r NVM_DIRECTORY="$HOME/.nvm"
     declare -r CONFIGS='

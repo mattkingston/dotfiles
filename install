@@ -6,13 +6,13 @@
 
 declare -r origin="git@github.com:mattkingston/dotfiles-base.git"
 
-if [[ -d "$(dirname $BASH_SOURCE)/os" ]]; then
-    declare -r tarballUrl="$(dirname $BASH_SOURCE)"
+if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
+    declare -r tarballUrl="$(dirname $BASH_SOURCE[0])"
 else
     declare -r tarballUrl="http://github.com/mattkingston/dotfiles-base/tarball/master"
 fi
 
-if [[ -d "$(dirname $BASH_SOURCE)/os" ]]; then
+if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
     declare -r installDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     declare extracted=1
 else
@@ -116,7 +116,7 @@ download_and_extract() {
 main() {
 
     declare workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

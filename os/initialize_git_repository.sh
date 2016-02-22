@@ -9,7 +9,7 @@ initialize_git_repository() {
     declare -r GIT_ORIGIN="$1"
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

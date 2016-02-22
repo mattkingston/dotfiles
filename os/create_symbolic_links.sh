@@ -50,7 +50,7 @@ create_symbolic_links() {
     local targetFile=''
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

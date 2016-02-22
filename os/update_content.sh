@@ -7,7 +7,7 @@
 update_content() {
 
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     if is_git_repository; then
 

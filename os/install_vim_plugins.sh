@@ -9,7 +9,7 @@ install_vim_plugins() {
     # Check if `Git` is installed
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     if ! cmd_exists 'git'; then
         print_error 'Git is required, please install it!\n'

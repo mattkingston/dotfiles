@@ -7,7 +7,7 @@
 main() {
 
 	local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     source ./install_xcode.sh
     source ./install_homebrew.sh

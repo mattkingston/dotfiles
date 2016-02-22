@@ -11,7 +11,7 @@ set_github_ssh_key() {
     local sshKeyFile='id_rsa.pub'
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

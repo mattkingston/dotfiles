@@ -8,7 +8,7 @@ install_applications() {
     declare -r OS="$(get_os)"
     
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     if [ "$OS" == 'osx' ]; then
         source ./os_x/installs/main.sh

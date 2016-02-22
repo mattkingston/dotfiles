@@ -34,7 +34,7 @@ export rvm_path=$RVM_DIR
 ' # END declare=CONFIGS
 
     local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE)"
+        && cd "$(dirname $BASH_SOURCE[0])"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
