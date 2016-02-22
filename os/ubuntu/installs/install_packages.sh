@@ -32,7 +32,7 @@ install_packages() {
     # Allow un-authenticated Apt repositories to install software
     # Required for latest git version (default apt version is 1.7 - too low)
     # Required for java core team ppa
-    suco echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
+    sudo echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -120,6 +120,8 @@ install_packages() {
     else
         print_success 'Git'
     fi
+
+    git config --global http.sslverify false
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

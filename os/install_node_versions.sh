@@ -23,6 +23,7 @@ install_node_versions() {
 
 # Node Version Manager
 
+export NVM_NODEJS_ORG_MIRROR=http://nodejs.org/dist
 export NVM_DIR="'$NVM_DIRECTORY'"
 [ -f "$NVM_DIR/nvm.sh" ] \
     && source "$NVM_DIR/nvm.sh"
@@ -47,8 +48,13 @@ export NVM_DIR="'$NVM_DIRECTORY'"
         print_result $? 'nvm'
 
         if [ $? -eq 0 ]; then
-            printf "%s" "$CONFIGS" >> "$HOME/.bash.local" \
+            if [ ! -f "$HOME/.bash.local" ]; then
+                echo "" > "$HOME/.bash.local"
+            fi
+
+            append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
                 && source "$HOME/.bash.local"
+            
             print_result $? 'nvm (update ~/.bash.local)'
         fi
 
