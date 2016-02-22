@@ -437,8 +437,8 @@ main() {
 
         # Proxy
 
-        export PROXY_USER="$proxyUser"
-        export PROXY_PASS="$proxyPass"
+        export PROXY_USER="'$proxyUser'"
+        export PROXY_PASS="'$proxyPass'"
 
         export HTTP_PROXY="'$httpProxy'"
         export HTTPS_PROXY="'$httpsProxy'"
