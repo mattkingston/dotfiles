@@ -32,7 +32,7 @@ install_packages() {
     # Allow un-authenticated Apt repositories to install software
     # Required for latest git version (default apt version is 1.7 - too low)
     # Required for java core team ppa
-    echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
+    suco echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -194,7 +194,7 @@ install_packages() {
     install_package 'Ack Grep' 'ack-grep'
 
     # Use `ack` instead of `grep-ack` by default
-    dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+    sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
 
     cd "$workingDirectory"
 

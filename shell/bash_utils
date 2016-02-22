@@ -204,7 +204,7 @@ elif [[ "$os" == 'ubuntu' ]]; then
     }
 
     package_is_installed() {
-        dpkg -s "$1"
+        dpkg -s "$1" | grep --only-matching "installed" &> /dev/null
     }
 
     update() {
