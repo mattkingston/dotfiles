@@ -173,6 +173,10 @@ install_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    install_package 'PCRE' 'pcregrep'
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     install_package 'Apache Ant' 'ant'
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -357,7 +357,7 @@ main() {
 
         ' # END declare=githubConfig
 
-        append_to_file "$HOME/.bash.local" "$githubConfig"
+        append_to_file_once "$HOME/.bash.local" "$githubConfig"
 
         print_in_white "\n    GitHub variables have been set in $HOME/.bash.local. You can change these any time by modifying this file\n\n"
     fi
@@ -446,9 +446,10 @@ main() {
 
         ' # END declare=proxyConfig
 
-        append_to_file "$HOME/.bash.local" "$proxyConfig"
+        truncate "$HOME/.bash.local.proxy"
+        append_to_file_once "$HOME/.bash.local.proxy" "$proxyConfig"
 
-        print_in_white "\n    Proxy variables have been set in $HOME/.bash.local. You can change these any time by modifying this file\n\n"
+        print_in_white "\n    Proxy variables have been set in $HOME/.bash.local.proxy. You can change these any time by modifying this file\n\n"
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

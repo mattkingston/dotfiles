@@ -374,46 +374,63 @@ chown_r() {
     print_success "Changed Owner: $(whoami) $1"
 }
 
+truncate() {
+    local -r file="$1"
+    cat /dev/null > "$file"
+
+    print_success "Truncate: $file"
+}
+
 append_to_file() {
     local -r file="$1"
     local -r content="$2"
 
-    echo "$content" >> "$file"
+    printf "%s" "$content" >> "$file"
 
     print_success "Append: $file"
 }
 
 append_to_file_once() {
+    if [[ "$(get_os)" == 'osx' ]]; then
+        echo "Sorry this method will not work in OS X" && return 1
+    fi
+
     local -r file="$1"
     local -r content="$2"
 
-    if ! grep -Fq "$content" "$file"; then
-        echo "$content" >> "$file"
-
+    if ! pcregrep -qM "$content" "$file"; then
+        printf "%s" "$content" >> "$file"
         print_success "Append: $file"
     fi
-
-    print_success "Already appended: $file"
 }
 
 append_to_file_at_line_once() {
+    if [[ "$(get_os)" == 'osx' ]]; then
+        echo "Sorry this method will not work in OS X" && return 1
+    fi
+
     local -r file="$1"
     local -r content="$2"
     local -r line="$3"
 
-    if ! grep -Fq "$content" "$file"; then
-      sed -i "$LINEi\n$content\n" "$file"
-
-      print_success "Insert: $file:$line"
+    if ! pcregrep -qM "$content" "$file"; then
+        sed -i "${line}i\n$content\n" "$file"
+        print_success "Append: $file:$line"
     fi
 }
 
 remove_from_file() {
+    if [[ "$(get_os)" == 'osx' ]]; then
+        echo "Sorry this method will not work in OS X" && return 1
+    fi
+
     local -r file="$1"
     local -r content="$2"
 
-    if grep -Fq "$content" "$file"; then
+    if pcregrep -qM "$content" "$file"; then
         sed -i "s/$content//" "$file"
+
+        print_success "Trimmed: $file"
     fi
 }
 
@@ -421,7 +438,7 @@ content_in_file() {
     local -r file="$2"
     local -r search="$1"
 
-    grep -Fq "$search" "$file" && return 0 || return 1
+    pcregrep -qM "$search" "$file" && return 0 || return 1
 }
 
 add_source_to_profile() {
