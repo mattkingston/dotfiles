@@ -12,6 +12,9 @@ install_packages() {
     # Tools for managing binaries (used for dpkg-divert below)
     install_package 'Debian Configuration Utils' 'debconf-utils'
 
+    # Simple configuration storage system
+    install_package 'GSettings' 'libglib2.0-bin'
+
     # Tools for compiling/building software from source
     install_package 'Build Essential' 'build-essential'
 
