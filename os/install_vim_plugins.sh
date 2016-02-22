@@ -37,10 +37,10 @@ install_vim_plugins() {
             && source "$HOME/.bash.local"
     fi
 
-    cd ~/.vim/plugins/tern_for_vim \
-        && npm install &> /dev/null
+    # cd ~/.vim/plugins/tern_for_vim \
+    #     && npm install &> /dev/null
     
-    print_result $? 'tern_for_vim (extra installations)'
+    # print_result $? 'tern_for_vim (extra installations)'
     
     cd "$workingDirectory"
 

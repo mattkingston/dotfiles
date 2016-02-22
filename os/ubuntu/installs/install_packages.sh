@@ -51,21 +51,21 @@ install_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if ! package_is_installed 'google-chrome-unstable'; then
+    # if ! package_is_installed 'google-chrome-unstable'; then
 
-        add_key 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
-        print_result $? "Chrome Canary (add key)"
+    #     add_key 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+    #     print_result $? "Chrome Canary (add key)"
 
-        add_to_source_list 'http://dl.google.com/linux/deb/ stable main' 'google-chrome.list'
-        print_result $? "Chrome Canary (add to package resource list)"
+    #     add_to_source_list 'http://dl.google.com/linux/deb/ stable main' 'google-chrome.list'
+    #     print_result $? "Chrome Canary (add to package resource list)"
 
-        update
+    #     update
 
-        install_package 'Chrome Canary' 'google-chrome-unstable'
+    #     install_package 'Chrome Canary' 'google-chrome-unstable'
 
-    else
-        print_success 'Chrome Canary'
-    fi
+    # else
+    #     print_success 'Chrome Canary'
+    # fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
