@@ -76,7 +76,7 @@ export rvm_path=$RVM_DIR
           && source $RVM_DIR/scripts/rvm
 
         # Install ruby versions
-        for i in ${NODE_VERSIONS[@]}; do
+        for i in ${RUBY_VERSIONS[@]}; do
 
             execute "rvm --quiet-curl --install $i" "rvm (install: $i)"
 

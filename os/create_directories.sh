@@ -23,7 +23,6 @@ create_directories() {
     for i in ${DIRECTORIES[@]}; do
         mkd "$HOME/$i"
         print_success "$HOME/$i"
-        print_lf
     done
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

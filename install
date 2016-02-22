@@ -13,7 +13,7 @@ else
 fi
 
 if [[ -d "$(dirname $BASH_SOURCE)/os" ]]; then
-    declare -r installDir="$(dirname $BASH_SOURCE)"
+    declare -r installDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     declare extracted=1
 else
     declare -r installDir="$HOME/projects/dotfiles"
@@ -146,14 +146,14 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
-    echo "$installDir"
-       
     if [[ "$extracted" -eq 1 ]]; then
         # The tarball has been downloaded and extracted already
         
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        cd "$installDir"
+        newInstallDir="$installDir"
+
+        cd "$newInstallDir"
         
     else
 
@@ -221,7 +221,7 @@ main() {
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            cd "$newInstallDir"
+        cd "$newInstallDir"
 
     fi
 
@@ -310,7 +310,7 @@ main() {
 
     fi
 
-    cd "$(dirname "$BASH_SOURCE")"
+    cd "$newInstallDir"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

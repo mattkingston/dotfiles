@@ -59,8 +59,6 @@ create_symbolic_links() {
         sourceFile="$(cd .. && pwd)/$i"
         targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
         
-        echo "$sourceFile"
-
         if [ ! -e "$targetFile" ]; then
             execute "ln -fs $sourceFile $targetFile" "$targetFile → $sourceFile"
         elif [ "$(readlink "$targetFile")" == "$sourceFile" ]; then
