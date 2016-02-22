@@ -8,8 +8,10 @@ set_terminal_preferences() {
 
     print_info 'Terminal'
 
-    execute 'gsettings set org.gnome.desktop.interface monospace-font-name "Monospace 12"' \
-        'Change font size'
+    if gsettings list-recursively | grep -q "org.gnome.desktop.interface"; then
+        execute 'gsettings set org.gnome.desktop.interface monospace-font-name "Monospace 12"' \
+            'Change font size'
+    fi
 
     execute '
         gconftool-2 --set "/apps/gnome-terminal/profiles/Default/use_theme_background" --type bool false \
