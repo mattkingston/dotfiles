@@ -6,10 +6,13 @@
 
 main() {
 
+    local workingDirectory="$(pwd)" \
+        && cd "$(dirname $BASH_SOURCE[0])"
+
     update_and_upgrade
     print_break
 
-    ./install_packages.sh
+    source ./install_packages.sh
     print_break
 
     update_and_upgrade
@@ -19,6 +22,8 @@ main() {
     # dependencies for other other packages and are no longer needed
 
     execute 'sudo apt-get autoremove -qqy' 'Autoremove'
+
+    cd "$workingDirectory"
 
 }
 

@@ -6,9 +6,14 @@
 
 main() {
 
-    ./set_privacy_preferences.sh
-    ./set_terminal_preferences.sh
-    ./set_ui_and_ux_preferences.sh
+    local workingDirectory="$(pwd)" \
+        && cd "$(dirname $BASH_SOURCE[0])"
+
+    source ./set_privacy_preferences.sh
+    source ./set_terminal_preferences.sh
+    source ./set_ui_and_ux_preferences.sh
+
+    cd "$workingDirectory"
 
 }
 

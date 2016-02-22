@@ -6,6 +6,9 @@
 
 install_packages() {
 
+    local workingDirectory="$(pwd)" \
+        && cd "$(dirname $BASH_SOURCE[0])"
+
     # Tools for managing binaries (used for dpkg-divert below)
     install_package 'Debian Configuration Utils' 'debconf-utils'
 
@@ -189,6 +192,8 @@ install_packages() {
 
     # Use `ack` instead of `grep-ack` by default
     dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+
+    cd "$workingDirectory"
 
 }
 
