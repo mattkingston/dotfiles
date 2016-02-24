@@ -82,9 +82,9 @@ export rvm_path=$RVM_DIR
 
         done
 
-        execute "rvm use --default $RUBY_DEFAULT" "rvm (set default: $RUBY_DEFAULT)"
+        execute_quietly "rvm use --default $RUBY_DEFAULT" "rvm (set default: $RUBY_DEFAULT)"
 
-        execute "rvm cleanup all" "rvm (cleanup)"
+        execute_quietly "rvm cleanup all" "rvm (cleanup)"
 
     fi
     

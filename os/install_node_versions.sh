@@ -75,11 +75,12 @@ export NVM_DIR="'$NVM_DIRECTORY'"
 
         # Install node versions
         for i in ${NODE_VERSIONS[@]}; do
-            execute "nvm install $i" "NVM (install: $i)"
+            if nvm ls "$i" | grep -q "N/A"; then
+                execute_quietly "nvm install $i" "NVM (install: $i)"
+            fi
         done
 
-        # Use `Node.js` by default
-        execute 'nvm alias default $DEFAULT_NODE_VERSION' 'NVM Default: $DEFAULT_NODE_VERSION'
+        execute_quietly "nvm alias default $DEFAULT_NODE_VERSION" "NVM Default: $DEFAULT_NODE_VERSION"
 
     fi
     

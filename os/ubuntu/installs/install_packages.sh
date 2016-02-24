@@ -9,6 +9,8 @@ install_packages() {
     local workingDirectory="$(pwd)" \
         && cd "$(dirname $BASH_SOURCE[0])"
 
+    update
+
     # Tools for managing binaries (used for dpkg-divert below)
     install_package 'Debian Configuration Utils' 'debconf-utils'
 
@@ -37,10 +39,7 @@ install_packages() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     if ! package_is_installed 'atom'; then
-
-        add_ppa 'webupd8team/atom'
-        
-        print_result $? "Atom (add PPA)"
+        add_ppa 'webupd8team/atom' "Atom (add PPA)"
 
         update
 
@@ -49,24 +48,6 @@ install_packages() {
     else
         print_success 'Atom'
     fi
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # if ! package_is_installed 'google-chrome-unstable'; then
-
-    #     add_key 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
-    #     print_result $? "Chrome Canary (add key)"
-
-    #     add_to_source_list 'http://dl.google.com/linux/deb/ stable main' 'google-chrome.list'
-    #     print_result $? "Chrome Canary (add to package resource list)"
-
-    #     update
-
-    #     install_package 'Chrome Canary' 'google-chrome-unstable'
-
-    # else
-    #     print_success 'Chrome Canary'
-    # fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -82,14 +63,12 @@ install_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    # Pre-accept key for Mozilla nightly
+    accept_key "keyserver.ubuntu.com" "EF4186FE247510BE"
+
     if ! package_is_installed 'firefox-trunk'; then
 
-        # Pre-accept key for Mozilla nightly
-        accept_key "keyserver.ubuntu.com" "EF4186FE247510BE"
-
-        add_ppa 'ubuntu-mozilla-daily/ppa'
-
-        print_result $? "Firefox Nightly (add PPA)"
+        add_ppa 'ubuntu-mozilla-daily/ppa' "Firefox Nightly (add PPA)"
 
         update
 
@@ -109,14 +88,12 @@ install_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    # Pre-accept key for Git
+    accept_key "keyserver.ubuntu.com" "A1715D88E1DF1F24"
+
     if ! package_is_installed 'git'; then
 
-        # Pre-accept key for Git
-        accept_key "keyserver.ubuntu.com" "A1715D88E1DF1F24"
-
-        add_ppa 'git-core/ppa'
-
-        print_result $? "Git (add PPA)"
+        add_ppa 'git-core/ppa' "Git (add PPA)"
 
         update
 
@@ -142,10 +119,7 @@ install_packages() {
 
         add_key 'http://deb.opera.com/archive.key'
 
-        print_result $? "Opera (add key)"
-
-        add_to_source_list 'http://deb.opera.com/opera/ stable non-free' 'opera.list'
-        print_result $? "Opera (add to package resource list)"
+        add_to_source_list 'http://deb.opera.com/opera/ stable non-free' 'opera.list' 'Opera (add sources)'
 
         update
 
@@ -179,7 +153,7 @@ install_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    install_package 'Zopfli' 'zopfli'
+    # install_package 'Zopfli' 'zopfli'
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

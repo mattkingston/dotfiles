@@ -46,14 +46,14 @@ install_npm_packages() {
 
     # Ensure the most recent version of `npm` is installed
 
-    execute 'npm install --global npm' 'npm (update)'
+    execute_quietly 'npm install --global npm' 'npm (update)'
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Install the `npm` packages
 
     for i in ${NPM_PACKAGES[@]}; do
-        execute "npm install --global $i" "$i"
+        execute_quietly "npm install --global $i" "$i"
     done
     
     cd "$workingDirectory"
