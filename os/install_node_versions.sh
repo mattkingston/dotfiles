@@ -8,6 +8,8 @@ declare -r -a NODE_VERSIONS=(
     '0.12.9'
 )
 
+declare -r DEFAULT_NODE_VERSION='0.12.9'
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Definitions
@@ -45,7 +47,8 @@ export NVM_DIR="'$NVM_DIRECTORY'"
     if [ ! -d "$NVM_DIRECTORY" ]; then
 
         git clone https://github.com/creationix/nvm.git "$NVM_DIRECTORY" &> /dev/null
-        print_result $? 'nvm'
+        
+        print_result $? 'NVM'
 
         if [ $? -eq 0 ]; then
             if [ ! -f "$HOME/.bash.local" ]; then
@@ -55,7 +58,7 @@ export NVM_DIR="'$NVM_DIRECTORY'"
             append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
                 && source "$HOME/.bash.local"
             
-            print_result $? 'nvm (update ~/.bash.local)'
+            print_result $? 'NVM (update ~/.bash.local)'
         fi
 
     fi
@@ -65,17 +68,18 @@ export NVM_DIR="'$NVM_DIRECTORY'"
         # Ensure the latest version of `nvm` is used
         cd "$NVM_DIRECTORY" \
             && git checkout `git describe --abbrev=0 --tags` &> /dev/null
-        print_result $? 'nvm (update)'
+        
+        print_result $? 'NVM (update)'
 
         source "$NVM_DIRECTORY/nvm.sh"
 
         # Install node versions
         for i in ${NODE_VERSIONS[@]}; do
-            execute "nvm install $i" "nvm (install: $i)"
+            execute "nvm install $i" "NVM (install: $i)"
         done
 
         # Use `Node.js` by default
-        execute 'nvm alias default node' 'nvm (set default)'
+        execute 'nvm alias default $DEFAULT_NODE_VERSION' 'NVM Default: $DEFAULT_NODE_VERSION'
 
     fi
     

@@ -18,6 +18,8 @@ install_homebrew_formulae() {
         install_package 'tmux' 'tmux'
         install_package 'PCRE' 'pcre'
         install_package 'Vim' 'vim --override-system-vi'
+        install_package 'Ack' 'ack'
+        install_package 'JQ' 'jq'
     fi
 
 }

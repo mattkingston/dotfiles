@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Source bash_profile - Yes it should be the other way around.
+# That's a fix for another day.
+
+source ~/.bash_profile

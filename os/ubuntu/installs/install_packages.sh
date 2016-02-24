@@ -39,6 +39,7 @@ install_packages() {
     if ! package_is_installed 'atom'; then
 
         add_ppa 'webupd8team/atom'
+        
         print_result $? "Atom (add PPA)"
 
         update
@@ -83,7 +84,11 @@ install_packages() {
 
     if ! package_is_installed 'firefox-trunk'; then
 
+        # Pre-accept key for Mozilla nightly
+        accept_key "keyserver.ubuntu.com" "EF4186FE247510BE"
+
         add_ppa 'ubuntu-mozilla-daily/ppa'
+
         print_result $? "Firefox Nightly (add PPA)"
 
         update
@@ -136,6 +141,7 @@ install_packages() {
     if ! package_is_installed 'opera'; then
 
         add_key 'http://deb.opera.com/archive.key'
+
         print_result $? "Opera (add key)"
 
         add_to_source_list 'http://deb.opera.com/opera/ stable non-free' 'opera.list'
@@ -197,6 +203,12 @@ install_packages() {
 
     # Use `ack` instead of `grep-ack` by default
     sudo dpkg-divert --local --divert /usr/bin/ack --rename --add /usr/bin/ack-grep
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    install_package 'JQ' 'jq'
+    
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     cd "$workingDirectory"
 

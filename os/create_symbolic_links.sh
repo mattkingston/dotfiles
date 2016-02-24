@@ -7,6 +7,7 @@
 declare -a FILES_TO_SYMLINK=(
     'shell/ackrc'
 
+    'shell/bashrc'
     'shell/bash_aliases'
     'shell/bash_exports'
     'shell/bash_extra'

@@ -169,7 +169,7 @@ elif [[ "$os" == 'ubuntu' ]]; then
         local keyserver="$1"
         local keys="$2"
 
-        execute "sudo apt-key adv --keyserver $keyserver --recv-keys $keys"
+        execute "sudo apt-key adv --keyserver $keyserver --recv-keys $keys" "Accept keys $2"
     }
 
     add_all_sources_keys() {
@@ -391,10 +391,6 @@ append_to_file() {
 }
 
 append_to_file_once() {
-    if [[ "$(get_os)" == 'osx' ]]; then
-        echo "Sorry this method will not work in OS X" && return 1
-    fi
-
     local -r file="$1"
     local -r content="$2"
 
