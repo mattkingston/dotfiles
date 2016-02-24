@@ -70,6 +70,7 @@ export rvm_path=$RVM_DIR
 
     fi
 
+
     if [ -d "$RVM_DIRECTORY" ]; then
 
         [ -s "$RVM_DIR/scripts/rvm" ] \
@@ -77,16 +78,19 @@ export rvm_path=$RVM_DIR
 
         # Install ruby versions
         for i in ${RUBY_VERSIONS[@]}; do
-
             execute "rvm --quiet-curl --install $i" "rvm (install: $i)"
-
         done
 
         execute_quietly "rvm use --default $RUBY_DEFAULT" "rvm (set default: $RUBY_DEFAULT)"
 
         execute_quietly "rvm cleanup all" "rvm (cleanup)"
 
+        execute_quietly "rvm osx-ssl-certs update all" "Update OS X SSL certs"
+
     fi
+
+    append_to_file_once .gemrc "http-proxy: $HTTP_PROXY"
+    append_to_file_once .gemrc "https-proxy: $HTTPS_PROXY"
     
     cd "$workingDirectory"
 

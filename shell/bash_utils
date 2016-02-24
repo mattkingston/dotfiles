@@ -110,6 +110,16 @@ if [[ "$os" == 'osx' ]]; then
         fi
     }
 
+    link_package() {
+        declare -r CMD="$3"
+        declare -r FORMULA="$2"
+        declare -r FORMULA_READABLE_NAME="$1"
+
+        if brew list "$FORMULA" &> /dev/null; then
+            execute "brew link $FORMULA" "$FORMULA_READABLE_NAME"
+        fi
+    }
+
     add_to_source_list() {
         declare -r REPOSITORY="$1"
 
@@ -264,7 +274,7 @@ execute() {
 }
 
 execute_quietly() {
-    eval "$1" > /dev/null 2>&1
+    eval "$1"
     print_result $? "${2:-$1}"
 }
 
@@ -383,6 +393,7 @@ chown_r() {
 
 truncate() {
     local -r file="$1"
+
     cat /dev/null > "$file"
 
     print_success "Truncate: $file"
@@ -392,8 +403,7 @@ append_to_file() {
     local -r file="$1"
     local -r content="$2"
 
-    printf "%s" "$content" >> "$file"
-
+    printf "$content\n" >> "$file"
     print_success "Append: $file"
 }
 
@@ -402,7 +412,7 @@ append_to_file_once() {
     local -r content="$2"
 
     if ! pcregrep -qM "$content" "$file"; then
-        printf "%s" "$content" >> "$file"
+        printf "$content\n" >> "$file"
         print_success "Append: $file"
     fi
 }

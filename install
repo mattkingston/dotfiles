@@ -260,6 +260,7 @@ main() {
         source ./os/install_node_versions.sh
         source ./os/install_npm_packages.sh
         source ./os/install_ruby_versions.sh
+        source ./os/install_vagrant.sh
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

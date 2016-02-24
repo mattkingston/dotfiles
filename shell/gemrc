@@ -6,4 +6,5 @@
 - http://gems.hashicorp.com/
 :update_sources: true
 :verbose: true
+:ssl_verify_mode: 0
 gem: "--no-ri --no-rdoc"

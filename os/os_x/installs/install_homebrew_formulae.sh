@@ -20,6 +20,11 @@ install_homebrew_formulae() {
         install_package 'Vim' 'vim --override-system-vi'
         install_package 'Ack' 'ack'
         install_package 'JQ' 'jq'
+        install_package 'OpenSSL' 'openssl'
+        link_package 'Link OpenSSL' 'openssl --force'
+        add_to_source_list 'raggi/ale'
+        install_package 'OpenSSL OSX Certs' 'openssl-osx-ca'
+        install_package 'Curl Certificates' 'curl-ca-bundle'
     fi
 
 }
