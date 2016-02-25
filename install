@@ -326,6 +326,10 @@ main() {
         export HTTPS_PROXY="'$httpsProxy'"
         export ALL_PROXY="'$allProxy'"
 
+        export http_proxy="'$httpProxy'"
+        export https_proxy="'$httpsProxy'"
+        export all_proxy="'$allProxy'"
+
         local proxyConfig='
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -337,6 +341,10 @@ main() {
         export HTTP_PROXY="'$httpProxy'"
         export HTTPS_PROXY="'$httpsProxy'"
         export ALL_PROXY="'$allProxy'"
+
+        export http_proxy="'$httpProxy'"
+        export https_proxy="'$httpsProxy'"
+        export all_proxy="'$allProxy'"
 
         ' # END declare=proxyConfig
 
