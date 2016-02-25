@@ -44,6 +44,15 @@ install_npm_packages() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    execute_quietly "npm config set registry http://registry.npmjs.org/" 'NPM Configure registry'
+
+    if [ ! "$HTTP_PROXY" = ""]; then
+        execute_quietly "npm config set proxy $HTTP_PROXY"
+        execute_quietly "npm config set https-proxy $HTTPS_PROXY"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     # Ensure the most recent version of `npm` is installed
 
     execute_quietly 'npm install --global npm' 'npm (update)'

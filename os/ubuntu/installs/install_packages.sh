@@ -34,7 +34,9 @@ install_packages() {
     # Allow un-authenticated Apt repositories to install software
     # Required for latest git version (default apt version is 1.7 - too low)
     # Required for java core team ppa
-    sudo echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
+    sudo su -c "echo 'APT::Get::AllowUnauthenticated 1;' > /etc/apt/apt.conf.d/02allow-unsigned"
+
+    accept_key "keyserver.ubuntu.com" "C2518248EEA14886"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -64,6 +66,7 @@ install_packages() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Pre-accept key for Mozilla nightly
+
     accept_key "keyserver.ubuntu.com" "EF4186FE247510BE"
 
     if ! package_is_installed 'firefox-trunk'; then
@@ -89,6 +92,7 @@ install_packages() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Pre-accept key for Git
+
     accept_key "keyserver.ubuntu.com" "A1715D88E1DF1F24"
 
     if ! package_is_installed 'git'; then
@@ -114,6 +118,8 @@ install_packages() {
     install_package 'ImageMagick' 'imagemagick'
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    accept_key "keyserver.ubuntu.com" "63F7D4AFF6D61D45"
 
     if ! package_is_installed 'opera'; then
 

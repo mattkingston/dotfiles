@@ -329,29 +329,6 @@ main() {
         export http_proxy="'$httpProxy'"
         export https_proxy="'$httpsProxy'"
         export all_proxy="'$allProxy'"
-
-        local proxyConfig='
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-        # Proxy
-
-        export PROXY_USER="'$proxyUser'"
-        export PROXY_PASS="'$proxyPass'"
-
-        export HTTP_PROXY="'$httpProxy'"
-        export HTTPS_PROXY="'$httpsProxy'"
-        export ALL_PROXY="'$allProxy'"
-
-        export http_proxy="'$httpProxy'"
-        export https_proxy="'$httpsProxy'"
-        export all_proxy="'$allProxy'"
-
-        ' # END declare=proxyConfig
-
-        echo "" > "$HOME/.bash.local.proxy"
-        append_to_file_once "$HOME/.bash.local.proxy" "$proxyConfig"
-
-        print_in_white "\n    Proxy variables have been set in $HOME/.bash.local.proxy. You can change these any time by modifying this file\n\n"
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -466,6 +443,35 @@ main() {
         append_to_file_once "$HOME/.bash.local" "$githubConfig"
 
         print_in_white "\n    GitHub variables have been set in $HOME/.bash.local. You can change these any time by modifying this file\n\n"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    if [ ! "$HTTP_PROXY" = "" ]; then
+
+        local proxyConfig='
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        # Proxy
+
+        export PROXY_USER="'$proxyUser'"
+        export PROXY_PASS="'$proxyPass'"
+
+        export HTTP_PROXY="'$httpProxy'"
+        export HTTPS_PROXY="'$httpsProxy'"
+        export ALL_PROXY="'$allProxy'"
+
+        export http_proxy="'$httpProxy'"
+        export https_proxy="'$httpsProxy'"
+        export all_proxy="'$allProxy'"
+
+        ' # END declare=proxyConfig
+
+        echo "" > "$HOME/.bash.local.proxy"
+        append_to_file_once "$HOME/.bash.local.proxy" "$proxyConfig"
+
+        print_in_white "\n    Proxy variables have been set in $HOME/.bash.local.proxy. You can change these any time by modifying this file\n\n"
+
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
