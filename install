@@ -250,7 +250,7 @@ main() {
     source "$HOME/.bash_profile"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
+
     print_info 'Proxy'
 
     ask_for_confirmation 'Do you want to set up Proxy details now?'
@@ -319,6 +319,13 @@ main() {
             allProxy="$(get_answer)"
         fi
 
+        export PROXY_USER="'$proxyUser'"
+        export PROXY_PASS="'$proxyPass'"
+
+        export HTTP_PROXY="'$httpProxy'"
+        export HTTPS_PROXY="'$httpsProxy'"
+        export ALL_PROXY="'$allProxy'"
+
         local proxyConfig='
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -333,7 +340,7 @@ main() {
 
         ' # END declare=proxyConfig
 
-        truncate "$HOME/.bash.local.proxy"
+        echo "" > "$HOME/.bash.local.proxy"
         append_to_file_once "$HOME/.bash.local.proxy" "$proxyConfig"
 
         print_in_white "\n    Proxy variables have been set in $HOME/.bash.local.proxy. You can change these any time by modifying this file\n\n"
