@@ -63,6 +63,16 @@ declare isProxySupplied="NO"
 
 # Definitions
 
+mask_string() {
+    local raw="$1"
+    echo ${raw:0:1}$( echo "${raw:1: -1}" | tr [:print:] \* )${raw: -1}
+}
+
+full_mask_string() {
+    local raw="$1"
+    echo $raw | tr [:print:] \*
+}
+
 is_http() {
     local url="$1"
 
@@ -501,7 +511,7 @@ main() {
 
     else
 
-        if ask_is_proxy_settings_correct; then
+        if ask_if_proxy_settings_correct; then
             save_proxy_settings
         else
             ask_for_confirmation 'Do you want to set up Proxy details now?'
