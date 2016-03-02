@@ -57,13 +57,10 @@ export rvm_path=$RVM_DIR
 
         print_result $? 'rvm'
 
-        if [ ! -f "$HOME/.bash.local" ]; then
-            echo "" > "$HOME/.bash.local"
-        fi
-
         if [ $? -eq 0 ]; then
-            printf "%s" "$CONFIGS" >> "$HOME/.bash.local" \
-                && source "$HOME/.bash.local"
+            [ -f "$HOME/.bash.local" ] \
+              && append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
+              && source "$HOME/.bash.local"
 
             print_result $? 'rvm (update ~/.bash.local)'
         fi

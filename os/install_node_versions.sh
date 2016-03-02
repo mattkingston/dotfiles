@@ -16,8 +16,8 @@ declare -r DEFAULT_NODE_VERSION='0.12.9'
 
 install_node_versions() {
 
-	local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE[0])"
+    local workingDirectory="$(pwd)" \
+      && cd "$(dirname $BASH_SOURCE[0])"
 
     declare -r NVM_DIRECTORY="$HOME/.nvm"
     declare -r CONFIGS='
@@ -51,12 +51,9 @@ export NVM_DIR="'$NVM_DIRECTORY'"
         print_result $? 'NVM'
 
         if [ $? -eq 0 ]; then
-            if [ ! -f "$HOME/.bash.local" ]; then
-                echo "" > "$HOME/.bash.local"
-            fi
-
-            append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
-                && source "$HOME/.bash.local"
+            [ -f "$HOME/.bash.local" ] \
+              && append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
+              && source "$HOME/.bash.local"
             
             print_result $? 'NVM (update ~/.bash.local)'
         fi

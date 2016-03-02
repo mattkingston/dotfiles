@@ -15,6 +15,7 @@ declare -r -a NPM_PACKAGES=(
     'svgo'
     'yo'
     'karma'
+    'fsmonitor'
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -23,15 +24,17 @@ declare -r -a NPM_PACKAGES=(
 
 install_npm_packages() {
 
-	local workingDirectory="$(pwd)" \
-        && cd "$(dirname $BASH_SOURCE[0])"
+    local workingDirectory="$(pwd)" \
+      && cd "$(dirname $BASH_SOURCE[0])"
 
     # Check if `NVM_DIR` is set, and if it's not, it's because
     # `~/.bash.local` was not sourced and therefore, npm won't
     # be available (this happens when the `dotfiles` are set up
     # for the first time)
 
-    [ -z "$NVM_DIR" ] && source "$HOME/.bash.local"
+    [ -z "$NVM_DIR" ] \
+      && [ -f "$HOME/.bash.local" ] \
+      && source "$HOME/.bash.local"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

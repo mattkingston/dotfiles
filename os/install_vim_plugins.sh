@@ -34,7 +34,7 @@ install_vim_plugins() {
 
     if ! cmd_exists 'npm'; then
         [ -f "$HOME/.bash.local" ] \
-            && source "$HOME/.bash.local"
+          && source "$HOME/.bash.local"
     fi
 
     # cd ~/.vim/plugins/tern_for_vim \
