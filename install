@@ -54,8 +54,8 @@ declare maskedAllProxy=""
 declare suppliedProxy=""
 declare proxyComplex=""
 
-declare argumentList=$0
-declare argumentListLength="${#argumentList}"
+declare -a argumentList=( "$@" )
+declare argumentListLength=$(expr ${#argumentList[@]} - 1)
 
 declare isProxySupplied="NO"
 
@@ -666,8 +666,9 @@ for i in ${argumentList[@]}; do
 done
 
 if [ "$isProxySupplied" == "YES" ]; then
-    for i in `seq 1 ${argumentListLength}`; do
-        if [[ "$i" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
+    for i in `seq 0 $argumentListLength`; do
+
+        if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
             suppliedProxy="${argumentList[$i+1]}"
         fi
     done
