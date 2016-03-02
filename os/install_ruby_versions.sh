@@ -70,6 +70,10 @@ export rvm_path=$RVM_DIR
 
     fi
 
+    if [ "$HTTP_PROXY" != '' ]; then
+        append_to_file_once .gemrc "http-proxy: $HTTP_PROXY"
+        append_to_file_once .gemrc "https-proxy: $HTTPS_PROXY"
+    fi
 
     if [ -d "$RVM_DIRECTORY" ]; then
 
@@ -85,15 +89,12 @@ export rvm_path=$RVM_DIR
 
         execute_quietly "rvm cleanup all" "rvm (cleanup)"
 
-        execute_quietly "rvm osx-ssl-certs update all" "Update OS X SSL certs"
+        if [[ "$(get_os)" == 'osx' ]]; then
+            execute_quietly "rvm osx-ssl-certs update all" "Update OS X SSL certs"
+        fi
 
     fi
 
-    if [ ! "$HTTP_PROXY" = ""]; then
-        append_to_file_once .gemrc "http-proxy: $HTTP_PROXY"
-        append_to_file_once .gemrc "https-proxy: $HTTPS_PROXY"
-    fi
-    
     cd "$workingDirectory"
 
 }
