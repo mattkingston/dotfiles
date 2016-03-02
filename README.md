@@ -11,8 +11,8 @@ To setup the dotfiles just run the appropriate snippet in the terminal:
 
 | OS | Snippet |
 |:---:|:---|
-| OS X | `bash -c "$(curl -kLsS https://raw.github.com/mattkingston/dotfiles/master/install)"` |
-| Ubuntu | `bash -c "$(wget --no-check-certificate -qO - https://raw.github.com/mattkingston/dotfiles/master/install)"` |
+| OS X | `bash -c "$(curl -kLsSH 'Cache-Control: no-cache' https://raw.github.com/mattkingston/dotfiles/master/install)"` |
+| Ubuntu | `bash -c "$(wget --no-check-certificate --no-cache -qO - https://raw.github.com/mattkingston/dotfiles/master/install)"` |
 
 ### Install actions
 
