@@ -250,7 +250,7 @@ ask_proxy_settings() {
     ask_proxy_domain
     ask_proxy_port
 
-    concat_proxy_settings()
+    concat_proxy_settings
 
     ask_for_confirmation "Proxy variables are:$(print_in_white "\n\n      HTTP_PROXY=$maskedHttpProxy\n      HTTPS_PROXY=$maskedHttpsProxy\n      ALL_PROXY=$maskedAllProxy")\n\n      $(print_in_blue "Are these correct?")"
 
