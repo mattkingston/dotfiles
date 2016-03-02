@@ -51,6 +51,14 @@ declare maskedHttpProxy=""
 declare maskedHttpsProxy=""
 declare maskedAllProxy=""
 
+declare suppliedProxy=""
+declare proxyComplex=""
+
+declare argumentList=$0
+declare argumentListLength="${#argumentList}"
+
+declare isProxySupplied="NO"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Definitions
@@ -710,14 +718,15 @@ main() {
 
 # Main
 
-if [ "$1" != "" ]; then
-    local argumentList=$0
-    local argumentListLength="${#argumentList}"
-    local suppliedProxy=""
-    local proxyComplex=""
+for i in ${argumentList[@]}; do
+    if [ "$i" == '--proxy' ]; then
+        isProxySupplied="YES"
+    fi
+done
 
-    for (( i=0; i < ${argumentListLength}; i++ )); do
-        if [[ "$i" == "-proxy" && $i+1 -le "$argumentListLength" ]]; then
+if [ "$isProxySupplied" == "YES" ]; then
+    for i in `seq 1 ${argumentListLength}`; do
+        if [[ "$i" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
             suppliedProxy="${argumentList[$i+1]}"
         fi
     done
