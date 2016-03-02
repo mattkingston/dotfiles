@@ -209,7 +209,7 @@ ask_proxy_domain() {
 
     else
 
-        while [[ -z "$proxyDomain" ]]; do
+        while [[ -z "$proxyDomain" || "$proxyDomain" == "" ]]; do
             ask 'Please enter the proxy domain/IP'
             proxyDomain="$(get_answer)"
         done
@@ -413,7 +413,7 @@ main() {
         if ! answer_is_yes; then
           newInstallDir=''
 
-          while [[ -z "$newInstallDir" ]]; do
+          while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
             ask 'Please specify another location for the base dotfiles (absolute path): '
 
             newInstallDir="$(get_answer)"
@@ -433,12 +433,12 @@ main() {
           else
             newInstallDir=''
 
-            while [[ -z "$newInstallDir" ]]; do
+            while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
               ask 'Please specify another location for the base dotfiles (absolute path): '
 
               newInstallDir="$(get_answer)"
 
-              if [[ -z "$newInstallDir" ]]; then
+              if [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; then
                 newInstallDir="$installDir"
               fi
             done
@@ -614,17 +614,17 @@ main() {
     ask_for_confirmation 'Do you want to set up GitHub credentials now?'
 
     if answer_is_yes; then
-        while [[ -z "$githubName" ]]; do
+        while [[ -z "$githubName" || "$githubName" == "" ]]; do
             ask 'Please enter your name (not user name)'
             githubName="$(get_answer)"
         done
 
-        while [[ -z "$githubUsername" ]]; do
+        while [[ -z "$githubUsername" || "$githubUsername" == "" ]]; do
             ask 'Please enter your GitHub username'
             githubUsername="$(get_answer)"
         done
 
-        while [[ -z "$githubEmail" ]]; do
+        while [[ -z "$githubEmail" || "$githubEmail" == "" ]]; do
             ask 'Please enter your GitHub email'
             githubEmail="$(get_answer)"
         done
