@@ -722,7 +722,7 @@ if [ "$1" != "" ]; then
         fi
     done
 
-    if [[ $suppliedProxy ~= ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
+    if [[ $suppliedProxy =~ ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
         proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
         proxyUser="$(echo $proxyComplex | cut -d':' -f1)"
         proxyPass="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f1)"
@@ -730,7 +730,7 @@ if [ "$1" != "" ]; then
         proxyPort="$(echo $proxyComplex | cut -d':' -f3)"
     fi
 
-    if [[ $suppliedProxy ~= ^https?://[^:]+:[0-9]{,4}$ ]]; then
+    if [[ $suppliedProxy =~ ^https?://[^:]+:[0-9]{,4}$ ]]; then
         proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
         proxyDomain="$(echo $proxyComplex | cut -d':' -f1 | cut -d'@' -f2)"
         proxyPort="$(echo $proxyComplex | cut -d':' -f2)"
