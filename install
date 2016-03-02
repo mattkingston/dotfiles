@@ -160,10 +160,18 @@ ask_proxy_user() {
 ask_proxy_pass() {
     ask_silent 'Please enter your proxy password'
     proxyPass="$(get_answer)"
-    maskedProxyPass="$(mask_string $proxyPass)"
 
     printf "$(full_mask_string $proxyPass)\n"
 
+    set_proxy_pass_masked
+    set_proxy_user_and_pass
+}
+
+set_proxy_pass_masked() {
+    maskedProxyPass="$(mask_string $proxyPass)"
+}
+
+set_proxy_user_and_pass() {
     if [ -n $proxyUser ]; then
         if [ -n $proxyPass ]; then
             proxyUserPass="$proxyUser:$proxyPass@"
@@ -182,22 +190,18 @@ ask_proxy_domain() {
 
         ask 'Please enter the HTTP proxy domain/IP'
         httpProxyDomain="$(get_answer)"
-        httpProxyUrl="$httpProxyDomain"
 
         ask 'Please enter the HTTPS proxy domain/IP'
         httpsProxyDomain="$(get_answer)"
-        httpsProxyUrl="$httpProxyDomain"
 
         ask 'Please enter any other proxy domain/IP'
         allProxyDomain="$(get_answer)"
-        allProxyUrl="$httpProxyDomain"
 
     else
 
         while [[ -z "$proxyDomain" ]]; do
             ask 'Please enter the proxy domain/IP'
             proxyDomain="$(get_answer)"
-            proxyUrl="$proxyDomain"
         done
 
     fi
@@ -211,33 +215,58 @@ ask_proxy_port() {
         ask 'Please enter the HTTP proxy port'
         httpProxyPort="$(get_answer)"
 
-        if [ -n $httpProxyPort ]; then
-            httpProxyUrl="$httpProxyUrl:$httpProxyPort"
-        fi
-
         ask 'Please enter the HTTPS proxy port'
         httpsProxyPort="$(get_answer)"
 
-        if [ -n $httpsProxyPort ]; then
-            httpsProxyUrl="$httpsProxyUrl:$httpsProxyPort"
-        fi
-
         ask 'Please enter any other proxy port'
         allProxyPort="$(get_answer)"
-
-        if [ -n $httpsProxyPort ]; then
-            allProxyUrl="$allProxyUrl:$allProxyPort"
-        fi
 
     else
 
         ask 'Please enter the proxy port'
         proxyPort="$(get_answer)"
 
-        if [ -n $proxyPort ]; then
-            proxyUrl="$proxyUrl:$proxyPort"
-        fi
+    fi
 
+    set_proxy_url
+}
+
+set_proxy_url() {
+
+    # Domain
+
+    if [ -n $proxyDomain ]; then
+        proxyUrl="$proxyDomain"
+    fi
+
+    if [ -n $httpProxyDomain ]; then
+        httpProxyUrl="$httpProxyDomain"
+    fi
+
+    if [ -n $httpsProxyDomain ]; then
+        httpsProxyUrl="$httpsProxyDomain"
+    fi
+
+    if [ -n $httpsProxyDomain ]; then
+        allProxyUrl="$allProxyDomain"
+    fi
+
+    # Concat port
+
+    if [ -n $proxyPort ]; then
+        proxyUrl="$proxyUrl:$proxyPort"
+    fi
+
+    if [ -n $httpProxyPort ]; then
+        httpProxyUrl="$httpProxyUrl:$httpProxyPort"
+    fi
+
+    if [ -n $httpsProxyPort ]; then
+        httpsProxyUrl="$httpsProxyUrl:$httpsProxyPort"
+    fi
+
+    if [ -n $httpsProxyPort ]; then
+        allProxyUrl="$allProxyUrl:$allProxyPort"
     fi
 
 }
@@ -252,6 +281,13 @@ concat_proxy_settings() {
     maskedAllProxy="http://${maskedProxyUserPass}${allProxyUrl:-$proxyUrl}"
 }
 
+ask_if_proxy_settings_correct() {
+    ask_for_confirmation "Proxy variables are:$(print_in_white "\n\n      HTTP_PROXY=$maskedHttpProxy\n      HTTPS_PROXY=$maskedHttpsProxy\n      ALL_PROXY=$maskedAllProxy")\n\n      $(print_in_blue "Are these correct?")"
+
+    [ ! answer_is_yes ] \
+        && return 1
+}
+
 ask_proxy_settings() {
     ask_proxy_user
     ask_proxy_pass
@@ -260,10 +296,12 @@ ask_proxy_settings() {
 
     concat_proxy_settings
 
-    ask_for_confirmation "Proxy variables are:$(print_in_white "\n\n      HTTP_PROXY=$maskedHttpProxy\n      HTTPS_PROXY=$maskedHttpsProxy\n      ALL_PROXY=$maskedAllProxy")\n\n      $(print_in_blue "Are these correct?")"
+    if ! ask_if_proxy_settings_correct; then
+        ask_for_confirmation "Do you want to try setting the proxy settings again?"
 
-    if ! answer_is_yes; then
-        ask_proxy_settings
+        if answer_is_yes; then
+            ask_proxy_settings
+        fi
     fi
 }
 
@@ -458,63 +496,16 @@ main() {
 
     else
 
-        maskedProxyPass="$(mask_string $proxyPass)"
+        if ask_is_proxy_settings_correct; then
+            save_proxy_settings
+        else
+            ask_for_confirmation 'Do you want to set up Proxy details now?'
 
-        if [ -n $proxyUser ]; then
-            if [ -n $proxyPass ]; then
-                proxyUserPass="$proxyUser:$proxyPass@"
-                maskedProxyUserPass="$proxyUser:$maskedProxyPass@"
-            else
-                proxyUserPass="$proxyUser@"
-                maskedProxyUserPass="$proxyUser@"
+            if answer_is_yes; then
+                ask_proxy_settings
+                save_proxy_settings
             fi
         fi
-
-        proxyUrl="$proxyDomain"
-
-        if [ -n $proxyPort ]; then
-            proxyUrl="$proxyUrl:$proxyPort"
-        fi
-
-        httpProxy="http://$proxyUserPass$proxyUrl"
-        httpsProxy="http://$proxyUserPass$proxyUrl"
-        allProxy="http://$proxyUserPass$proxyUrl"
-
-        maskedHttpProxy="http://$maskedProxyUserPass$proxyUrl"
-        maskedHttpsProxy="http://$maskedProxyUserPass$proxyUrl"
-        maskedAllProxy="http://$maskedProxyUserPass$proxyUrl"
-
-        ask_for_confirmation "Proxy variables are:$(print_in_white "\n\n      HTTP_PROXY=$maskedHttpProxy\n      HTTPS_PROXY=$maskedHttpsProxy\n      ALL_PROXY=$maskedAllProxy")\n\n      $(print_in_blue "Are these correct?")"
-
-        if ! answer_is_yes; then
-            ask 'Please enter your proxy username'
-            proxyUser="$(get_answer)"
-
-            ask_silent 'Please enter your proxy password'
-            proxyPass="$(get_answer)"
-
-            ask 'Please enter the HTTP proxy'
-            httpProxy="$(get_answer)"
-
-            ask 'Please enter the HTTPS proxy'
-            httpsProxy="$(get_answer)"
-
-            ask 'Please enter the ALL proxy'
-            allProxy="$(get_answer)"
-        fi
-
-        export PROXY_USER="'$proxyUser'"
-        export PROXY_PASS="'$proxyPass'"
-
-        export HTTP_PROXY="'$httpProxy'"
-        export HTTPS_PROXY="'$httpsProxy'"
-        export ALL_PROXY="'$allProxy'"
-
-        export http_proxy="'$httpProxy'"
-        export https_proxy="'$httpsProxy'"
-        export all_proxy="'$allProxy'"
-
-        save_proxy_settings -u $proxyUser -p $proxyPass -h $httpProxy -s $httpsProxy -a $allProxy
 
     fi
 
@@ -675,8 +666,13 @@ if [ "$isProxySupplied" == "YES" ]; then
 
     if [[ $suppliedProxy =~ ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
         proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
+
         proxyUser="$(echo $proxyComplex | cut -d':' -f1)"
         proxyPass="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f1)"
+
+        set_proxy_pass_masked
+        set_proxy_user_and_pass
+
         proxyDomain="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f2)"
         proxyPort="$(echo $proxyComplex | cut -d':' -f3)"
     fi
@@ -686,6 +682,10 @@ if [ "$isProxySupplied" == "YES" ]; then
         proxyDomain="$(echo $proxyComplex | cut -d':' -f1 | cut -d'@' -f2)"
         proxyPort="$(echo $proxyComplex | cut -d':' -f2)"
     fi
+
+    set_proxy_url
+
+    concat_proxy_settings
 fi
 
 main
