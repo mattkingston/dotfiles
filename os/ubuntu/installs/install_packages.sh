@@ -34,7 +34,7 @@ install_packages() {
     # Allow un-authenticated Apt repositories to install software
     # Required for latest git version (default apt version is 1.7 - too low)
     # Required for java core team ppa
-    sudo su -c "echo 'APT::Get::AllowUnauthenticated 1;' > /etc/apt/apt.conf.d/02allow-unsigned"
+    echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee /etc/apt/apt.conf.d/02allow-unsigned"
 
     accept_key "keyserver.ubuntu.com" "C2518248EEA14886"
 

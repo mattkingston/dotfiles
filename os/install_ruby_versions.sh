@@ -67,6 +67,7 @@ export rvm_path=$RVM_DIR
 
     fi
 
+    # TODO - Include this bit in the bash proxy watcher
     if [ "$HTTP_PROXY" != '' ]; then
         append_to_file_once "$HOME/.gemrc" "http-proxy: $HTTP_PROXY"
         append_to_file_once "$HOME/.gemrc" "https-proxy: $HTTPS_PROXY"

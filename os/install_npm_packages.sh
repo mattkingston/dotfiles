@@ -49,6 +49,7 @@ install_npm_packages() {
 
     execute_quietly "npm config set registry http://registry.npmjs.org/" 'NPM Configure registry'
 
+    # TODO - Include this bit in the bash proxy watcher
     if [ "$HTTP_PROXY" != "" ]; then
         execute_quietly "npm config set proxy $HTTP_PROXY" "NPM HTTP Proxy"
         execute_quietly "npm config set https-proxy $HTTPS_PROXY" "NPM HTTPS Proxy"
