@@ -717,7 +717,7 @@ if [ "$1" != "" ]; then
     local proxyComplex=""
 
     for (( i=0; i < ${argumentListLength}; i++ )); do
-        if [[ "$i" == "-proxy" && $i+1 -le "$argumentListLength" ]];
+        if [[ "$i" == "-proxy" && $i+1 -le "$argumentListLength" ]]; then
             suppliedProxy="${argumentList[$i+1]}"
         fi
     done
