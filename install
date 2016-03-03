@@ -20,44 +20,11 @@ else
     declare extracted=0
 fi
 
-declare bashLocalProxy="$HOME/.bash.local.proxy"
-
-declare proxyUser=""
-declare proxyPass=""
-
-declare proxyDomain=""
-declare proxyPort=""
-declare proxyUrl=""
-
-declare httpProxyDomain=""
-declare httpsProxyDomain=""
-declare allProxyDomain=""
-
-declare httpProxyPort=""
-declare httpsProxyPort=""
-declare allProxyPort=""
-
-declare httpProxyUrl=""
-declare httpsProxyUrl=""
-declare allProxyUrl=""
-
-declare maskedProxyPass=""
-
-declare proxyUserPass=""
-
-declare maskedProxyUserPass=""
-
-declare maskedHttpProxy=""
-declare maskedHttpsProxy=""
-declare maskedAllProxy=""
-
-declare suppliedProxy=""
-declare proxyComplex=""
-
 declare -a argumentList=( "$@" )
 declare argumentListLength=$(expr ${#argumentList[@]} - 1)
-
 declare isProxySupplied="NO"
+declare suppliedProxy=""
+declare DEBUG="NO"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -499,9 +466,10 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if [ "$isProxySupplied" == "YES" ]; then
+    print_info 'Proxy'
 
-        print_info 'Proxy'
+    if [[ -n $suppliedProxy && "$isProxySupplied" == "YES" ]]; then
+        parse_supplied_proxy "$suppliedProxy"
 
         ask_if_proxy_settings_correct
 
@@ -517,8 +485,6 @@ main() {
         fi
 
     else
-
-        print_info 'Proxy'
 
         ask_for_confirmation 'Do you want to set up Proxy details now?'
 
@@ -676,58 +642,15 @@ for i in ${argumentList[@]}; do
     fi
 done
 
-if [ "$isProxySupplied" == "YES" ]; then
-    for i in `seq 0 $argumentListLength`; do
-
-        if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
-            suppliedProxy="${argumentList[$i+1]}"
-        fi
-
-        if [[ "${argumentList[$i]}" == '--debug' ]]; then
-            DEBUG="YES"
-        fi
-    done
-
-    if [[ $suppliedProxy =~ ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
-        proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
-
-        proxyUser="$(echo $proxyComplex | cut -d':' -f1)"
-        proxyPass="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f1)"
-
-        set_proxy_pass_masked
-        set_proxy_user_and_pass
-
-        proxyDomain="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f2)"
-        proxyPort="$(echo $proxyComplex | cut -d':' -f3)"
-
-    elif [[ $suppliedProxy =~ ^https?://[^:]+:[0-9]{,4}$ ]]; then
-
-        proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
-        proxyDomain="$(echo $proxyComplex | cut -d':' -f1 | cut -d'@' -f2)"
-        proxyPort="$(echo $proxyComplex | cut -d':' -f2)"
+for i in `seq 0 $argumentListLength`; do
+    if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
+        suppliedProxy="${argumentList[$i+1]}"
     fi
 
-    set_proxy_url
-
-    concat_proxy_settings
-
-    if [ "$DEBUG" == "YES" ]; then
-        echo '$proxyComplex='$proxyComplex
-        echo '$proxyUser='$proxyUser
-        echo '$proxyPass='$proxyPass
-
-        echo '$proxyUserPass='$proxyUserPass
-        echo '$maskedProxyUserPass='$maskedProxyUserPass
-
-        echo '$proxyDomain='$proxyDomain
-        echo '$proxyPort='$proxyPort
-
-        echo '$proxyUrl='$proxyUrl
-
-        echo '$httpProxy='$httpProxy
-        echo '$maskedHttpProxy='$maskedHttpProxy
+    if [[ "${argumentList[$i]}" == '--debug' ]]; then
+        DEBUG="YES"
     fi
-fi
+done
 
 main
 

@@ -880,6 +880,49 @@ save_proxy_settings() {
     fi
 }
 
+parse_supplied_proxy() {
+    local suppliedProxy="$1"
+
+    if [[ $suppliedProxy =~ ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
+        proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
+
+        proxyUser="$(echo $proxyComplex | cut -d':' -f1)"
+        proxyPass="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f1)"
+
+        set_proxy_pass_masked
+        set_proxy_user_and_pass
+
+        proxyDomain="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f2)"
+        proxyPort="$(echo $proxyComplex | cut -d':' -f3)"
+
+    elif [[ $suppliedProxy =~ ^https?://[^:]+:[0-9]{,4}$ ]]; then
+        proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
+        proxyDomain="$(echo $proxyComplex | cut -d':' -f1 | cut -d'@' -f2)"
+        proxyPort="$(echo $proxyComplex | cut -d':' -f2)"
+    fi
+
+    set_proxy_url
+
+    concat_proxy_settings
+
+    if [ "$DEBUG" == "YES" ]; then
+        echo '$proxyComplex='$proxyComplex
+        echo '$proxyUser='$proxyUser
+        echo '$proxyPass='$proxyPass
+
+        echo '$proxyUserPass='$proxyUserPass
+        echo '$maskedProxyUserPass='$maskedProxyUserPass
+
+        echo '$proxyDomain='$proxyDomain
+        echo '$proxyPort='$proxyPort
+
+        echo '$proxyUrl='$proxyUrl
+
+        echo '$httpProxy='$httpProxy
+        echo '$maskedHttpProxy='$maskedHttpProxy
+    fi
+}
+
 change_proxy() {
     ask_proxy_settings
     save_proxy_settings
