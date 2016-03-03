@@ -53,6 +53,8 @@ install_npm_packages() {
     if [ "$HTTP_PROXY" != "" ]; then
         execute_quietly "npm config set proxy $HTTP_PROXY" "NPM HTTP Proxy"
         execute_quietly "npm config set https-proxy $HTTPS_PROXY" "NPM HTTPS Proxy"
+
+        print_in_white "\n    Proxy set: $HOME/.npmrc.\n\n"
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

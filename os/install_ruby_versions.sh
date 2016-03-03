@@ -71,6 +71,8 @@ export rvm_path=$RVM_DIR
     if [ "$HTTP_PROXY" != '' ]; then
         append_to_file_once "$HOME/.gemrc" "http-proxy: $HTTP_PROXY"
         append_to_file_once "$HOME/.gemrc" "https-proxy: $HTTPS_PROXY"
+
+        print_in_white "\n    Proxy set: $HOME/.gemrc.\n\n"
     fi
 
     if [ -d "$RVM_DIRECTORY" ]; then
