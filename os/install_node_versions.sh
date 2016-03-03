@@ -52,9 +52,8 @@ export NVM_DIR="'$NVM_DIRECTORY'"
 
     [ -f "$HOME/.bash.local" ] \
       && append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
-      && source "$HOME/.bash.local"
-
-    print_result $? 'NVM (update ~/.bash.local)'
+      && source "$HOME/.bash.local" \
+      && print_result $? "NVM (update $HOME/.bash.local)"
 
     if [ -d "$NVM_DIRECTORY" ]; then
 
