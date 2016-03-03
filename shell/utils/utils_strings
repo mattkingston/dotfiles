@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# String/Numeric handling Definitions
+
+mask_string() {
+    local raw="$1"
+    echo ${raw:0:1}$( echo "${raw:1: -1}" | tr [:print:] \* )${raw: -1}
+}
+
+full_mask_string() {
+    local raw="$1"
+    echo $raw | tr [:print:] \*
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# VCS Definitions
+
+is_git_repository() {
+    git rev-parse &> /dev/null
+    return $?
+}

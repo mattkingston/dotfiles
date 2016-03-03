@@ -1,0 +1,137 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# IO Definitions
+
+is_interactive() {
+    [[ -t "0" || ( -t "0" || -p /dev/stdin ) ]] \
+        && return 0 \
+        || return 1;
+}
+
+is_yes() {
+    [[ "$1" =~ ^[Yy]es$ || "$1" =~ ^[Yy]$ ]] \
+        && return 0 \
+        || return 1
+}
+
+is_no() {
+    [[ "$1" =~ ^[Nn]o?$ ]] \
+        && return 0 \
+        || return 1
+}
+
+ask() {
+    print_question "$1"
+    read
+}
+
+ask_silent() {
+    print_question "$1"
+    read -s
+}
+
+ask_for_confirmation() {
+    print_question "$1"
+
+    while read -r -s -n 1; do
+        # if the answer is null or “y” or “n” (not case sensitive)
+        # we can accept the answer. All other letters are ignored
+
+        if [[ -z "$REPLY" ]] || ([[ -n "$REPLY" ]] && (is_yes "$REPLY" || is_no "$REPLY")); then
+            printf "$REPLY"
+            break
+        fi
+    done
+
+    printf "\n"
+}
+
+answer_is_null() {
+    [[ -z "$REPLY" ]] \
+        && return 0 \
+        || return 1
+}
+
+answer_is_yes() {
+    is_yes "$REPLY" \
+        && return 0 \
+        || return 1
+}
+
+get_answer() {
+    printf "$REPLY"
+}
+
+print_in_green() {
+    printf "\e[38;5;82m$1\e[0m"
+}
+
+print_in_purple() {
+    printf "\e[38;5;165m$1\e[0m"
+}
+
+print_in_orange() {
+    printf "\e[38;5;136m$1\e[0m"
+}
+
+print_in_red() {
+    printf "\e[38;5;196m$1\e[0m"
+}
+
+print_in_blue() {
+    printf "\e[38;5;75m$1\e[0m"
+}
+
+print_in_yellow() {
+    printf "\e[38;5;226m$1\e[0m"
+}
+
+print_in_grey() {
+    printf "\e[38;5;240m$1\e[0m"
+}
+
+print_in_white() {
+    printf "\e[38;5;255m$1\e[0m"
+}
+
+print_lf() {
+    printf "\n"
+}
+
+print_break() {
+    printf "\n -----\n\n"
+}
+
+print_info() {
+    print_in_purple "\n      $1\n"
+}
+
+print_subtle() {
+    print_in_grey "      $1\n"
+}
+
+print_question() {
+    print_in_blue "\n  [?] $1 "
+}
+
+print_success() {
+    print_in_green "\n  [✔] $1\n"
+}
+
+print_notice() {
+    print_in_yellow "  [!] $1\n"
+}
+
+print_error() {
+    print_in_red "\n  [✖] $1 $2\n"
+}
+
+print_result() {
+    [[ "$1" -eq 0 ]] \
+        && print_success "$2" \
+        || print_error "${3:-$2}";
+
+    return $1
+}

@@ -1,0 +1,232 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# OS Definitions
+
+get_os() {
+    declare osName="$(uname -s)"
+    declare os=''
+
+    if [ "$osName" == "Darwin" ]; then
+        os='osx'
+    elif [ "$osName" == "Linux" ] && [ -e "/etc/lsb-release" ]; then
+        os='ubuntu'
+    else
+        os="$osName"
+    fi
+
+    printf "%s" "$os"
+}
+
+is_supported_version() {
+    declare -a v1=(${1//./ })
+    declare -a v2=(${2//./ })
+
+    declare i=''
+
+    # Fill empty positions in v1 with zeros
+    for (( i=${#v1[@]}; i<${#v2[@]}; i++ )); do
+        v1[i]=0
+    done
+
+    for (( i=0; i<${#v1[@]}; i++ )); do
+
+        # Fill empty positions in v2 with zeros
+        if [[ -z ${v2[i]} ]]; then
+            v2[i]=0
+        fi
+
+        if (( 10#${v1[i]} < 10#${v2[i]} )); then
+            return 1
+        fi
+
+    done
+}
+
+verify_os() {
+    declare -r minOSXVersion='10.9'
+    declare -r minUbuntuVersion='12.04'
+    declare -r osName="$(uname -s)"
+
+    declare osVersion=''
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `OS X` and
+    # it's above the required version
+
+    if [[ "$os" == 'osx' ]]; then
+        osVersion="$(sw_vers -productVersion)"
+
+        is_supported_version "$osVersion" "$minOSXVersion" \
+            && return 0 \
+            || printf "Sorry, this script is intended only for OS X $minOSXVersion+"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `Ubuntu` and
+    # it's above the required version
+
+    elif [[ "$os" == 'ubuntu' ]]; then
+        osVersion="$(lsb_release -d | cut -f2 | cut -d' ' -f2)"
+
+        is_supported_version "$osVersion" "$minUbuntuVersion" \
+            && return 0 \
+            || printf "Sorry, this script is intended only for Ubuntu $minUbuntuVersion+"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    else
+        printf 'Sorry, this script is intended only for OS X and Ubuntu!'
+    fi
+
+    return 1
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# OS Dependent Definitions
+
+if [[ -z "$os" ]]; then
+    declare os="$(get_os)"
+fi
+
+if [[ "$os" == 'osx' ]]; then
+
+    # - - - - - - - - - - -
+
+    # OS X Definitions
+
+    install_package() {
+        declare -r CMD="$3"
+        declare -r FORMULA="$2"
+        declare -r FORMULA_READABLE_NAME="$1"
+
+        if brew "$CMD" list "$FORMULA" &> /dev/null; then
+            print_success "$FORMULA_READABLE_NAME"
+        else
+            execute "brew $CMD install $FORMULA" "$FORMULA_READABLE_NAME"
+        fi
+    }
+
+    link_package() {
+        declare -r CMD="$3"
+        declare -r FORMULA="$2"
+        declare -r FORMULA_READABLE_NAME="$1"
+
+        if brew list "$FORMULA" &> /dev/null; then
+            execute "brew link $FORMULA" "$FORMULA_READABLE_NAME"
+        fi
+    }
+
+    add_to_source_list() {
+        declare -r REPOSITORY="$1"
+
+        brew tap "$REPOSITORY" &> /dev/null
+        print_result $? "brew tap $REPOSITORY\n"
+
+        return $?
+    }
+
+    package_is_installed() {
+        if cmd_exists 'brew'; then
+            brew list "$1" \
+                && return 0 \
+                || return 1;
+        fi
+
+        return 1;
+    }
+
+    update() {
+        # System software update tool
+        # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/softwareupdate.8.html
+
+        execute 'sudo softwareupdate --install --all' 'Update system software'
+
+        if cmd_exists 'brew'; then
+            execute 'brew update' 'brew (update)'
+            execute 'brew upgrade --all' 'brew (upgrade)'
+            execute 'brew cleanup' 'brew (cleanup)'
+
+            if cmd_exists 'npm'; then
+                execute 'npm install -g npm' 'NPM (update)'
+                execute 'npm update -g' 'NPM (upgrade all)'
+            fi
+        fi
+    }
+
+elif [[ "$os" == 'ubuntu' ]]; then
+
+    # - - - - - - - - - - -
+
+    # Ubuntu Definitions
+
+    add_key() {
+        wget -qO - "$1" | sudo apt-key add -
+        #     │└─ write output to file
+        #     └─ don't show output
+    }
+
+    accept_key() {
+        local keyserver="$1"
+        local keys="$2"
+
+        execute_quietly "sudo -E apt-key adv --keyserver $keyserver --recv-keys $keys > /dev/null 2>&1" "Accept keys $2"
+    }
+
+    add_all_sources_keys() {
+        awk -F/ '/^[[:blank:]]*deb[[:blank:]]+http:\/\/ppa\.launchpad\.net\// {print "https://launchpad.net/~"$4"/+archive"}' \
+          /etc/apt/sources.list{,.d/*.list} | \
+          xargs -- wget -q -O- | \
+          awk -F\" '/http:\/\/keyserver\.ubuntu\.com:11371/ {sub(/amp;op=index/,"op=get");print $2}' | \
+          xargs -- wget -q -O- | sudo apt-key add -
+    }
+
+    add_ppa() {
+        sudo -E add-apt-repository -y ppa:"$1" > /dev/null 2>&1
+        print_result $? "${2:-$1}"
+    }
+
+    add_to_source_list() {
+        sudo sh -c "printf 'deb $1' >> '/etc/apt/sources.list.d/$2'"
+        print_result $? "${3:-$2}"
+    }
+
+    install_package() {
+        declare -r PACKAGE="$2"
+        declare -r PACKAGE_READABLE_NAME="$1"
+
+        if ! package_is_installed "$PACKAGE"; then
+            print_subtle "Installing: $PACKAGE_READABLE_NAME"
+
+            execute_quietly "sudo -E apt-get -qq install --allow-unauthenticated -y $PACKAGE" "$PACKAGE_READABLE_NAME"
+            #        suppress output ─┘                                   │
+            #                 assume "yes" as the answer to all prompts ──┘
+        else
+            print_success "$PACKAGE_READABLE_NAME"
+        fi
+    }
+
+    package_is_installed() {
+        dpkg -s "$1" | grep --only-matching "installed" > /dev/null
+    }
+
+    update() {
+        print_subtle "\nUpdating: please stand by this could take a while"
+
+        # Resynchronize the package index files from their sources
+        execute_quietly 'sudo -E apt-get -qq update -y' 'Update'
+
+        print_subtle "\nUpgrading: please stand by this could take a while"
+
+        # Install the newest versions of all packages installed
+        execute_quietly 'sudo -E apt-get -qq upgrade -y' 'Upgrade'
+
+        if cmd_exists 'npm'; then
+            execute_quietly 'npm install -g npm' 'NPM (update)'
+            execute_quietly 'npm upgrade -g' 'NPM (upgrade all)'
+    }
+
+fi

@@ -1,0 +1,168 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# File System Definitions
+
+su_mkd() {
+    if [[ -n "$1" ]]; then
+        if [[ -e "$1" ]]; then
+            if [[ ! -d "$1" ]]; then
+                print_error "$1 - a file with the same name already exists!"
+            else
+                print_success "$1"
+            fi
+        else
+            execute "sudo mkdir -p $1" "$1"
+        fi
+    fi
+}
+
+mkd() {
+    if [[ -n "$1" ]]; then
+        if [[ -e "$1" ]]; then
+            if [[ ! -d "$1" ]]; then
+                print_error "$1 - a file with the same name already exists!"
+            else
+                print_success "$1"
+            fi
+        else
+            execute "mkdir -p $1" "$1"
+        fi
+    fi
+}
+
+download_and_extract() {
+    local url="$1"
+    local tmpFile="$2"
+    local tmpDir="$3"
+
+    if [[ "$url" == "http"* ]]; then
+        if download "$url" "$tmpFile"; then
+            if extract "$tmpFile" "$tmpDir"; then
+                return 0
+            fi
+        fi
+    else
+        if [[ -f "$url" && "$url" == *".tar"* ]]; then
+            cp "$url" "$tmpFile"
+
+            if extract "$tmpFile" "$tmpDir"; then
+                return 0
+            fi
+        elif [[ -d "$url" ]]; then
+            if cp -r "$url/." "$tmpDir/"; then
+                return 0
+            fi
+        fi
+    fi
+
+    return 1
+}
+
+extract() {
+    local archive="$1"
+    local outputDir="$2"
+
+    # Extract the contents of a zip file (gzipped donest matter when extracting)
+    if command -v 'tar' &> /dev/null; then
+        tar -zxf "$archive" --strip-components 1 -C "$outputDir"
+        return $?
+    fi
+
+    return 1
+}
+
+extract_into() {
+    local workingDirectory="$(pwd)"
+    local archive="$1"
+    local outputDir="$($2 || pwd)"
+
+    # Move into the directory we want to extract into
+    cd "$outputDir"
+
+    # Extract the contents of a zip file (gzipped donest matter when extracting)
+    if command -v 'tar' &> /dev/null; then
+        tar -zxf "$archive" "$archive"
+        return $?
+    fi
+
+    cd "$workingDirectory"
+}
+
+chown_r() {
+    chown -R "$(whoami)":"$(whoami)" $1
+
+    print_success "Changed Owner: $(whoami) $1"
+}
+
+truncate() {
+    local -r file="$1"
+
+    cat /dev/null > "$file"
+
+    print_success "Truncate: $file"
+}
+
+append_to_file() {
+    local -r file="$1"
+    local -r content="$2"
+
+    printf "$content\n" >> "$file"
+    print_success "Append: $file"
+}
+
+append_to_file_once() {
+    local -r file="$1"
+    local -r content="$2"
+
+    if content_in_file "$content" "$file"; then
+        printf "$content\n" >> "$file"
+        print_success "Append: $file"
+    fi
+}
+
+append_to_file_at_line_once() {
+    if [[ "$(get_os)" == 'osx' ]]; then
+        echo "Sorry this method will not work in OS X" && return 1
+    fi
+
+    local -r file="$1"
+    local -r content="$2"
+    local -r line="$3"
+
+    if content_in_file "$content" "$file"; then
+        sed -i "${line}i\n$content\n" "$file"
+        print_success "Append: $file:$line"
+    fi
+}
+
+remove_from_file() {
+    if [[ "$(get_os)" == 'osx' ]]; then
+        echo "Sorry this method will not work in OS X" && return 1
+    fi
+
+    local -r file="$1"
+    local -r content="$2"
+
+    if content_in_file "$content" "$file"; then
+        sed -i "s/$content//" "$file"
+
+        print_success "Trimmed: $file"
+    fi
+}
+
+content_in_file() {
+    local -r file="$2"
+    local -r search="$1"
+
+    if cmd_exists 'pcregrep'; then
+        if ! pcregrep -qM "$search" "$file"; then
+            return 1
+        fi
+    else
+        if ! grep -q "$search" "$file"; then
+            return 1
+        fi
+    fi
+}

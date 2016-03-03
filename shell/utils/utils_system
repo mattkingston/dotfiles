@@ -1,0 +1,99 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# System Definitions
+
+ask_for_sudo() {
+    # Ask for the administrator password upfront
+    sudo -v &> /dev/null
+
+    # Update existing `sudo` time stamp until this script has finished
+    # https://gist.github.com/cowboy/3118588
+    while true; do
+        sudo -n true
+        sleep 60
+        kill -0 "$$" || exit
+    done &> /dev/null &
+}
+
+can_sudo() {
+    [[ "$(whoami)" != "root" && ! is_interactive ]] \
+        && return 0 \
+        || return 1;
+}
+
+cmd_exists() {
+    command -v "$1" > /dev/null
+    return $?
+}
+
+execute() {
+    eval "$1"
+    print_result $? "${2:-$1}"
+}
+
+execute_quietly() {
+    eval "$1" > /dev/null
+    print_result $? "${2:-$1}"
+}
+
+restart() {
+    sudo shutdown -r now &> /dev/null
+}
+
+if [[ "$os" == 'osx' ]]; then
+    # Empty the trash, the main HDD and on all mounted volumes
+    # and clear Apple’s system logs to improve shell startup speed
+
+    empty_trash() {
+        sudo rm -frv /Volumes/*/.Trashes \
+          && sudo rm -frv ~/.Trash \
+          && sudo rm -frv /private/var/log/asl/*.asl'
+    }
+
+    # Hide/Show desktop icons
+
+    hide_desktop_icons() {
+        defaults write com.apple.finder CreateDesktop -bool false && killall Finder
+    }
+
+    show_desktop_icons() {
+        defaults write com.apple.finder CreateDesktop -bool true && killall Finder
+    }
+
+    # Hide/Show hidden files in Finder
+
+    hide_hidden_files() {
+        defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder
+    }
+
+    show_hidden_files() {
+        defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
+    }
+
+    # Copy to clipboard
+
+    cc() {
+        pbcopy
+    }
+
+elif [ "$OS" == 'ubuntu' ]; then
+
+    # Hide/Show desktop icons
+
+    hide_desktop_icons() {
+        gsettings set org.gnome.desktop.background show-desktop-icons false
+    }
+
+    show_desktop_icons() {
+        gsettings set org.gnome.desktop.background show-desktop-icons true
+    }
+
+    # Copy to clipboard
+
+    cc() {
+        xclip -selection clip
+    }
+
+fi

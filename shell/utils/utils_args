@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Arguments Definitions
+
+has_argument() { # bool : true (0) | false (1)
+    local -r argumentList=$1
+    local -r argumentName="$2"
+
+    for i in ${argumentList[@]}; do
+        [[ "$i" == "$argumentName" ]] \
+            && return 0
+    done
+
+    return 1
+}
+
+get_prefixed_argument() { # string
+    local -r argumentList=$1
+    local -r argumentPrefix="$2"
+
+    for i in ${argumentList[@]}; do
+        [[ ${argumentList[$i]} =~ ^$argumentPrefix ]] \
+            && "$(echo ${argumentList[$i]} | sed s/$argumentPrefix//)"
+    done
+}
+
+get_next_argument() { # string
+    local -r argumentList=$1
+    local -r argumentName="$2"
+    local -r argumentListLength="${#argumentList}"
+
+    for (( i=0; i < ${argumentListLength}; i++ )); do
+        [[ "$i" == "$argumentName" && $i+1 -le "$argumentListLength" ]] \
+            && return ${argumentList[$i+1]};
+    done
+}
+
+get_argument_at() { # string
+    local -r argumentList=$1
+    local -r argumentIndex="$2"
+
+    [[ -z ${argumentList[$argumentIndex]} ]] \
+        && return ${argumentList[$argumentIndex]}
+}
