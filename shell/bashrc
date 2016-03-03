@@ -1,8 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Source bash_profile - Yes it should be the other way around.
-# That's a fix for another day.
+# Source bash_utils - I would like all util functions available in any
+# bash script executed.
 
-source ~/.bash_profile
+[ -f "~/.bash_utils" ] \
+  && source ~/.bash_utils
