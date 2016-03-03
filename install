@@ -348,6 +348,12 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    if [ ! -f "$HOME/.dotfiles_installed" ]; then
+        echo "YES" > "$HOME/.dotfiles_installed"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     print_info 'Restart'
 
     if [ "$(whoami)" == "vagrant" ]; then
