@@ -182,8 +182,8 @@ set_proxy_pass_masked() {
 }
 
 set_proxy_user_and_pass() {
-    if [ -n $proxyUser ]; then
-        if [ -n $proxyPass ]; then
+    if [ -n "$proxyUser" ]; then
+        if [ -n "$proxyPass" ]; then
             proxyUserPass="$proxyUser:$proxyPass@"
             maskedProxyUserPass="$proxyUser:$maskedProxyPass@"
         else
@@ -245,37 +245,37 @@ set_proxy_url() {
 
     # Domain
 
-    if [ -n $proxyDomain ]; then
+    if [ -n "$proxyDomain" ]; then
         proxyUrl="$proxyDomain"
     fi
 
-    if [ -n $httpProxyDomain ]; then
+    if [ -n "$httpProxyDomain" ]; then
         httpProxyUrl="$httpProxyDomain"
     fi
 
-    if [ -n $httpsProxyDomain ]; then
+    if [ -n "$httpsProxyDomain" ]; then
         httpsProxyUrl="$httpsProxyDomain"
     fi
 
-    if [ -n $httpsProxyDomain ]; then
+    if [ -n "$allProxyDomain" ]; then
         allProxyUrl="$allProxyDomain"
     fi
 
     # Concat port
 
-    if [ -n $proxyPort ]; then
+    if [ -n "$proxyPort" ]; then
         proxyUrl="$proxyUrl:$proxyPort"
     fi
 
-    if [ -n $httpProxyPort ]; then
+    if [ -n "$httpProxyPort" ]; then
         httpProxyUrl="$httpProxyUrl:$httpProxyPort"
     fi
 
-    if [ -n $httpsProxyPort ]; then
+    if [ -n "$httpsProxyPort" ]; then
         httpsProxyUrl="$httpsProxyUrl:$httpsProxyPort"
     fi
 
-    if [ -n $httpsProxyPort ]; then
+    if [ -n "$allProxyPort" ]; then
         allProxyUrl="$allProxyUrl:$allProxyPort"
     fi
 
@@ -316,7 +316,7 @@ ask_proxy_settings() {
 }
 
 save_proxy_settings() {
-    if [ "$httpProxy" != "" ]; then
+    if [ -n "$httpProxy" ]; then
 
         local proxyConfig='
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -690,9 +690,9 @@ if [ "$isProxySupplied" == "YES" ]; then
 
         proxyDomain="$(echo $proxyComplex | cut -d':' -f2 | cut -d'@' -f2)"
         proxyPort="$(echo $proxyComplex | cut -d':' -f3)"
-    fi
 
-    if [[ $suppliedProxy =~ ^https?://[^:]+:[0-9]{,4}$ ]]; then
+    elif [[ $suppliedProxy =~ ^https?://[^:]+:[0-9]{,4}$ ]]; then
+
         proxyComplex="$(echo $suppliedProxy | cut -d'/' -f3)"
         proxyDomain="$(echo $proxyComplex | cut -d':' -f1 | cut -d'@' -f2)"
         proxyPort="$(echo $proxyComplex | cut -d':' -f2)"
