@@ -20,7 +20,7 @@ else
     declare extracted=0
 fi
 
-declare bashLocalProxy=".bash.local.proxy"
+declare bashLocalProxy="$HOME/.bash.local.proxy"
 
 declare proxyUser=""
 declare proxyPass=""
@@ -335,16 +335,16 @@ save_proxy_settings() {
 
         ' # END declare=proxyConfig
 
-        echo "" > "$HOME/$bashLocalProxy"
+        echo "" > "$bashLocalProxy"
 
-        append_to_file_once "$HOME/$bashLocalProxy" "$proxyConfig"
+        append_to_file_once "$bashLocalProxy" "$proxyConfig"
 
         # TODO - Include this bit in the bash proxy watcher
         if [ "$(get_os)" == 'ubuntu' ]; then
             echo 'Acquire::http::Proxy "'$httpProxy'";' | sudo tee "/etc/apt/apt.conf.d/01proxy" > /dev/null 2>&1
         fi
 
-        print_in_white "\n    Proxy variables have been saved to $HOME/$bashLocalProxy.\n\n"
+        print_in_white "\n    Proxy variables have been saved to $bashLocalProxy.\n\n"
 
         print_in_white "\n    Proxy set: /etc/apt/apt.conf.d/01proxy.\n\n"
 
@@ -499,7 +499,7 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if [[ "$proxyUser" == "" ]]; then
+    if [[ -z "$proxyUser" || "$proxyUser" == "" ]]; then
 
         print_info 'Proxy'
 
@@ -680,6 +680,10 @@ if [ "$isProxySupplied" == "YES" ]; then
         if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
             suppliedProxy="${argumentList[$i+1]}"
         fi
+
+        if [[ "${argumentList[$i]}" == '--debug' ]]; then
+            DEBUG="YES"
+        fi
     done
 
     if [[ $suppliedProxy =~ ^https?://[^:]+:[^@]+@[^:]+:[0-9]{,4}$ ]]; then
@@ -704,6 +708,23 @@ if [ "$isProxySupplied" == "YES" ]; then
     set_proxy_url
 
     concat_proxy_settings
+
+    if [ "$DEBUG" == "YES" ]; then
+        echo '$proxyComplex='$proxyComplex
+        echo '$proxyUser='$proxyUser
+        echo '$proxyPass='$proxyPass
+
+        echo '$proxyUserPass='$proxyUserPass
+        echo '$maskedProxyUserPass='$maskedProxyUserPass
+
+        echo '$proxyDomain='$proxyDomain
+        echo '$proxyPort='$proxyPort
+
+        echo '$proxyUrl='$proxyUrl
+
+        echo '$httpProxy='$httpProxy
+        echo '$maskedHttpProxy='$maskedHttpProxy
+    fi
 fi
 
 main
