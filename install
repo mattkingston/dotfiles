@@ -23,6 +23,22 @@ declare suppliedProxy=""
 
 declare debug="NO"
 
+for i in ${argumentList[@]}; do
+    if [ "$i" == '--proxy' ]; then
+        isProxySupplied="YES"
+    fi
+done
+
+for i in `seq 0 $argumentListLength`; do
+    if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
+        suppliedProxy="${argumentList[$i+1]}"
+    fi
+
+    if [[ "${argumentList[$i]}" == '--debug' ]]; then
+        debug="YES"
+    fi
+done
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Definitions
@@ -49,31 +65,26 @@ main() {
 
         if [[ "$tarballUrl" == "http"* ]]; then
             if command -v 'curl' &> /dev/null; then
-                curl -LksSo "$tmpFile" "$tarballUrl" &> /dev/null \
-                  || echo "Download failed" && exit 1
+                curl -LksSo "$tmpFile" "$tarballUrl" &> /dev/null
             elif command -v 'wget' &> /dev/null; then
-                wget --no-check-certificate -qO "$tmpFile" "$tarballUrl" &> /dev/null \
-                  || echo "Download failed" && exit 1
+                wget --no-check-certificate -qO "$tmpFile" "$tarballUrl" &> /dev/null
             else
-                echo "curl or wget required. Cannot continue" && exit 1
+                echo "curl or wget required. Cannot continue"
+                exit 1
             fi
 
             if command -v 'tar' &> /dev/null; then
-                tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" \
-                  || echo "Tar extraction failed" && exit 1
+                tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" &> /dev/null
             fi
         else
             if [[ -f "$tarballUrl" && "$tarballUrl" == *".tar"* ]]; then
                 cp "$tarballUrl" "$tmpFile"
 
                 if command -v 'tar' &> /dev/null; then
-                    tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" \
-                      || echo "Tar extraction failed" && exit 1
+                    tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" &> /dev/null
                 fi
             elif [[ -d "$tarballUrl" ]]; then
-                if cp -r "$tarballUrl/." "$tmpDir/"; then
-                    return 0
-                fi
+                cp -r "$tarballUrl/." "$tmpDir/"
             fi
         fi
 
@@ -362,22 +373,6 @@ main() {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Main
-
-for i in ${argumentList[@]}; do
-    if [ "$i" == '--proxy' ]; then
-        isProxySupplied="YES"
-    fi
-done
-
-for i in `seq 0 $argumentListLength`; do
-    if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
-        suppliedProxy="${argumentList[$i+1]}"
-    fi
-
-    if [[ "${argumentList[$i]}" == '--debug' ]]; then
-        DEBUG="YES"
-    fi
-done
 
 main
 

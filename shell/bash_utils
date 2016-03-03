@@ -12,6 +12,6 @@ declare -a utils=(
 )
 
 for i in ${utils[@]}; do
-    [ -f "$(dirname $BASH_SOURCE[0])/utils/util_${i}" ] \
-      && source "$(dirname $BASH_SOURCE[0])/utils/util_${i}"
+    [ -f "$(dirname $BASH_SOURCE[0])/utils/utils_${i}" ] \
+      && source "$(dirname $BASH_SOURCE[0])/utils/utils_${i}"
 done
