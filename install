@@ -263,15 +263,8 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    print_info 'Create bash locals'
-
-    if [ -f "$HOME/.bash.local" ]; then
-        ask_for_confirmation 'Do you want to overwrite bash local dotfiles?'
-
-        if answer_is_yes; then
-            source ./os/create_bash_locals.sh
-        fi
-    else
+    if [ ! -f "$HOME/.bash.local" ] || [ ! -f "$HOME/.bash.local.proxy" ]; then
+        print_info 'Create bash locals'
         source ./os/create_bash_locals.sh
     fi
 

@@ -927,3 +927,7 @@ change_proxy() {
     ask_proxy_settings
     save_proxy_settings
 }
+
+restart() {
+    sudo shutdown -r now &> /dev/null
+}
