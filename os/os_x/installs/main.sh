@@ -17,7 +17,7 @@ main() {
     source ./install_homebrew_alternate_casks.sh
     source ./install_homebrew_web_font_tools.sh
 
-    update_and_upgrade
+    update
 
     source ./cleanup.sh
     
