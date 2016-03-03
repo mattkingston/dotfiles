@@ -428,12 +428,20 @@ main() {
 
     print_info 'Restart'
 
-    ask_for_confirmation 'Do you want to restart?'
+    if [ "$(whoami)" == "vagrant" ]; then
 
-    if answer_is_yes; then
-        source ./os/restart.sh
-    else
         print_success "Provisioning complete\n"
+        print_info 'An updated shell is required. Please exit from this Vagrant VM and re-ssh in, or simply run `source ~/.bash_profile`'
+
+    else
+
+        ask_for_confirmation 'Do you want to restart?'
+
+        if answer_is_yes; then
+            source ./os/restart.sh
+        else
+            print_success "Provisioning complete\n"
+        fi
     fi
 
     cd "$workingDirectory"
