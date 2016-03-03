@@ -227,6 +227,7 @@ elif [[ "$os" == 'ubuntu' ]]; then
         if cmd_exists 'npm'; then
             execute_quietly 'npm install -g npm' 'NPM (update)'
             execute_quietly 'npm upgrade -g' 'NPM (upgrade all)'
+        fi
     }
 
 fi
