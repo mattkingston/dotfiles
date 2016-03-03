@@ -45,20 +45,16 @@ export NVM_DIR="'$NVM_DIRECTORY'"
     # Install `nvm` and add the necessary configs to `~/.bash.local`
 
     if [ ! -d "$NVM_DIRECTORY" ]; then
-
         git clone https://github.com/creationix/nvm.git "$NVM_DIRECTORY" &> /dev/null
         
         print_result $? 'NVM'
-
-        if [ $? -eq 0 ]; then
-            [ -f "$HOME/.bash.local" ] \
-              && append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
-              && source "$HOME/.bash.local"
-            
-            print_result $? 'NVM (update ~/.bash.local)'
-        fi
-
     fi
+
+    [ -f "$HOME/.bash.local" ] \
+      && append_to_file_once "$HOME/.bash.local" "$CONFIGS" \
+      && source "$HOME/.bash.local"
+
+    print_result $? 'NVM (update ~/.bash.local)'
 
     if [ -d "$NVM_DIRECTORY" ]; then
 
