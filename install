@@ -323,7 +323,7 @@ save_proxy_settings() {
         # Proxy
 
         export PROXY_USER="'$proxyUser'"
-        export PROXY_PASS="'$proxPass'"
+        export PROXY_PASS="'$proxyPass'"
 
         export HTTP_PROXY="'$httpProxy'"
         export HTTPS_PROXY="'$httpsProxy'"
@@ -341,10 +341,12 @@ save_proxy_settings() {
 
         # TODO - Include this bit in the bash proxy watcher
         if [ "$(get_os)" == 'ubuntu' ]; then
-            echo 'Acquire::http::Proxy "'$httpProxy'";' | sudo tee "/etc/apt/apt.conf.d/01proxy"
+            echo 'Acquire::http::Proxy "'$httpProxy'";' | sudo tee "/etc/apt/apt.conf.d/01proxy" > /dev/null 2>&1
         fi
 
-        print_in_white "\n    Proxy variables have been set in $HOME/$bashLocalProxy. You can change these any time by modifying this file\n\n"
+        print_in_white "\n    Proxy variables have been saved to $HOME/$bashLocalProxy.\n\n"
+
+        print_in_white "\n    Proxy set: /etc/apt/apt.conf.d/01proxy.\n\n"
 
         export PROXY_USER="'$proxyUser'"
         export PROXY_PASS="'$proxyPass'"
