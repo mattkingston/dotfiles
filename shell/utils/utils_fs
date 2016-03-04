@@ -116,7 +116,7 @@ append_to_file_once() {
     local -r file="$1"
     local -r content="$2"
 
-    if content_in_file "$content" "$file"; then
+    if ! content_in_file "$content" "$file"; then
         printf "$content\n" >> "$file"
         print_success "Append: $file"
     fi
@@ -131,7 +131,7 @@ append_to_file_at_line_once() {
     local -r content="$2"
     local -r line="$3"
 
-    if content_in_file "$content" "$file"; then
+    if ! content_in_file "$content" "$file"; then
         sed -i "${line}i\n$content\n" "$file"
         print_success "Append: $file:$line"
     fi
