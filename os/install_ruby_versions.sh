@@ -77,8 +77,8 @@ export rvm_path=$RVM_DIR
 
     if [ -d "$RVM_DIRECTORY" ]; then
 
-        [ -s "$RVM_DIR/scripts/rvm" ] \
-          && source $RVM_DIR/scripts/rvm
+        [ -s "$RVM_DIRECTORY/scripts/rvm" ] \
+          && source $RVM_DIRECTORY/scripts/rvm
 
         # Install ruby versions
         for i in ${RUBY_VERSIONS[@]}; do
