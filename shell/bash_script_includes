@@ -8,6 +8,6 @@ declare -a includes=(
 )
 
 for i in ${includes[@]}; do
-    [ -f "$HOME/${i}" ] \
-      && source "$HOME/${i}"
+    [ -f "$HOME/.${i}" ] \
+      && source "$HOME/.${i}"
 done
