@@ -4,7 +4,7 @@
 
 # Variables
 
-declare -r origin="git@github.com:mattkingston/dotfiles.git"
+declare -r origin="http://github.com/mattkingston/dotfiles.git"
 declare -r installDir="$HOME/projects/dotfiles"
 
 if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
@@ -196,6 +196,20 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    # Save dotfiles location for later
+
+    DOTFILES_CONFIGS='
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Dotfiles
+
+    export DOTFILES_DIR="'$newInstallDir'"
+    '
+
+    append_to_file_once "$HOME/.bash.local" "$DOTFILES_CONFIGS"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     print_info 'Proxy'
 
     if [[ -n $suppliedProxy && "$isProxySupplied" == "YES" ]]; then
@@ -286,7 +300,7 @@ main() {
 
                     if answer_is_yes; then
                         echo "Update content"
-                        #source ./os/update_content.sh
+                        #update_dotfiles
                     fi
                 fi
             fi

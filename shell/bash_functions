@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# ----------------------------------------------------------------------
-# | File System                                                        |
-# ----------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# File System
 
 # Create data URI from a file
 
@@ -27,16 +27,12 @@ datauri() {
 
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # Delete files that match a certain pattern from the current directory
 
-delete-files() {
+delete_files() {
     local q="${1:-*.DS_Store}"
     find . -type f -name "$q" -ls -delete
 }
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Get gzip information (gzipped file size + reduction size)
 
@@ -71,8 +67,6 @@ gz() {
 
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # Create new directories and enter the first one
 
 mkd() {
@@ -80,9 +74,9 @@ mkd() {
     #                     └─ make parent directories if needed
 }
 
-# ----------------------------------------------------------------------
-# | Miscellaneous                                                      |
-# ----------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Miscellaneous
 
 # Simple Calculator
 
@@ -109,9 +103,9 @@ mkd() {
 
 }
 
-# ----------------------------------------------------------------------
-# | Network                                                            |
-# ----------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Network
 
 # Start an HTTP server from a directory, optionally specifying the port
 
@@ -178,9 +172,9 @@ httpd.serve_forever()
 
 }
 
-# ----------------------------------------------------------------------
-# | Search                                                             |
-# ----------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Search
 
 # Search history
 
@@ -193,7 +187,6 @@ qh() {
     #       don't clear the screen after quitting less ─┘
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Search for text within the current directory
 
@@ -203,9 +196,9 @@ qt() {
     #     └─ ignore case
 }
 
-# ----------------------------------------------------------------------
-# | Text Processing                                                    |
-# ----------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Text Processing
 
 # Human redable file size
 # (because `du -h` doesn't cut it for me)
@@ -237,4 +230,24 @@ hrfs() {
     sed -e ":l; s/\([0-9]\)\([0-9]\{3\}\)/\1,\2/; t l"
     #                          └─ add commas to the numbers
     #                             (changes "1023.2 KB" to "1,023.2 KB")
+}
+
+update_dotfiles() {
+
+    local workingDirectory="$(pwd)" \
+        && cd "$DOTFILES_DIR"
+
+    if is_git_repository; then
+
+        # Update content and remove untracked files
+        git fetch --all &> /dev/null \
+            && git reset --hard origin/master &> /dev/null \
+            && git clean -fd  &> /dev/null
+
+        print_result $? 'Update dotfiles'
+
+    fi
+
+    cd "$workingDirectory"
+
 }
