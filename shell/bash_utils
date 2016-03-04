@@ -1,8 +1,10 @@
 #!/bin/bash
 
-[[ "$(uname -s)" == "Darwin" ]] \
-  && trueSource="$(readlink $BASH_SOURCE)" \
-  || trueSource="$(readlink -f $BASH_SOURCE)"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    trueSource="$(readlink $BASH_SOURCE)"
+else
+    trueSource="$(readlink -f $BASH_SOURCE)"
+fi
 
 if [ -d "$trueSource" ]; then
     trueSource="$(cd "$trueSource"; pwd)"
