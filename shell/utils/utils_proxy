@@ -35,6 +35,37 @@ declare maskedHttpProxy=""
 declare maskedHttpsProxy=""
 declare maskedAllProxy=""
 
+reset_proxy_vars() {
+    proxyUser=""
+    proxyPass=""
+
+    proxyDomain=""
+    proxyPort=""
+    proxyUrl=""
+
+    httpProxyDomain=""
+    httpsProxyDomain=""
+    allProxyDomain=""
+
+    httpProxyPort=""
+    httpsProxyPort=""
+    allProxyPort=""
+
+    httpProxyUrl=""
+    httpsProxyUrl=""
+    allProxyUrl=""
+
+    maskedProxyPass=""
+
+    proxyUserPass=""
+
+    maskedProxyUserPass=""
+
+    maskedHttpProxy=""
+    maskedHttpsProxy=""
+    maskedAllProxy=""
+}
+
 ask_proxy_user() {
     ask 'Please enter your proxy username'
     proxyUser="$(get_answer)"
@@ -141,15 +172,15 @@ set_proxy_url() {
     fi
 
     if [ -n "$httpProxyPort" ]; then
-        httpProxyUrl="$httpProxyUrl:$httpProxyPort"
+        httpProxyUrl="$httpProxyUrl:${httpProxyPort:-$proxyPort}"
     fi
 
     if [ -n "$httpsProxyPort" ]; then
-        httpsProxyUrl="$httpsProxyUrl:$httpsProxyPort"
+        httpsProxyUrl="$httpsProxyUrl:${httpsProxyPort:-$proxyPort}"
     fi
 
     if [ -n "$allProxyPort" ]; then
-        allProxyUrl="$allProxyUrl:$allProxyPort"
+        allProxyUrl="$allProxyUrl:${allProxyPort:-$proxyPort}"
     fi
 
 }
@@ -179,6 +210,8 @@ ask_proxy_settings() {
     ask_if_proxy_settings_correct
 
     if ! answer_is_yes; then
+        reset_proxy_vars
+
         ask_for_confirmation "Do you want to try setting the proxy settings again?"
 
         if answer_is_yes; then
