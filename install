@@ -60,7 +60,7 @@ main() {
     # Download dotfiles to a temporary location
 
     if [[ "$extracted" == "YES" ]]; then
-        source "$installDir/shell/bash_utils"
+        source "$(dirname $BASH_SOURCE[0])/shell/bash_utils"
     else
 
         if [[ "$tarballUrl" == "http"* ]]; then

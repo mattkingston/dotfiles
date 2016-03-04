@@ -2,7 +2,7 @@
 
 [[ "$(uname -s)" == "Darwin" ]] \
   && trueSource="$(readlink $BASH_SOURCE)" \
-  || trueSource="$(readlink -f $BASH_SOURCE[0])"
+  || trueSource="$(readlink -f $BASH_SOURCE)"
 
 if [ -d "$trueSource" ]; then
     trueSource="$(cd "$trueSource"; pwd)"
