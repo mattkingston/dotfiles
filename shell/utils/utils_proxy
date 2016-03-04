@@ -4,8 +4,6 @@
 
 # Proxy Definitions
 
-declare bashLocalProxy="$HOME/.bash.local.proxy"
-
 declare proxyUser=""
 declare proxyPass=""
 
@@ -240,11 +238,9 @@ save_proxy_settings() {
 
         ' # END declare=proxyConfig
 
-        echo "" > "$bashLocalProxy"
+        echo "$proxyConfig" > "$HOME/.bash.local.proxy"
 
-        append_to_file_once "$bashLocalProxy" "$proxyConfig"
-
-        print_in_white "\n    Proxy variables have been saved to $bashLocalProxy.\n"
+        print_in_white "\n    Proxy variables have been saved to $HOME/.bash.local.proxy.\n"
 
         # TODO - Include this bit in the bash proxy watcher
         if [ "$(get_os)" == 'ubuntu' ]; then
@@ -261,7 +257,7 @@ save_proxy_settings() {
             print_in_white "\n    Proxy set: $HOME/.npmrc.\n\n"
         fi
 
-        if [[ -n "$RVM_DIRECTORY" && -d "$RVM_DIRECTORY" ]]; then
+        if [[ -n "$RVM_DIR" && -d "$RVM_DIR" ]]; then
             # TODO - Include this bit in the bash proxy watcher
             append_to_file_once "$HOME/.gemrc" "http-proxy: $HTTP_PROXY"
             append_to_file_once "$HOME/.gemrc" "https-proxy: $HTTPS_PROXY"

@@ -173,7 +173,7 @@ elif [[ "$os" == 'ubuntu' ]]; then
         local keyserver="$1"
         local keys="$2"
 
-        execute_quietly "sudo -E apt-key adv --keyserver $keyserver --recv-keys $keys > /dev/null 2>&1" "Accept keys $2"
+        execute "sudo -E apt-key adv --keyserver $keyserver --recv-keys $keys" "Accept keys $2"
     }
 
     add_all_sources_keys() {

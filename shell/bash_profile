@@ -52,10 +52,10 @@ source_bash_files() {
         'bash_options'
         'bash_prompt'
         'bash_extra'
-        'bash_login'
         'bash.local' # for local settings that should
                      # not be under version control
         'bash.local.proxy' # for local proxy settings (do not verson control)
+        'bash_login'
     )
 
     for i in ${!FILES_TO_SOURCE[*]}; do
