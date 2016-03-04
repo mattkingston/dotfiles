@@ -236,6 +236,10 @@ save_proxy_settings() {
         export https_proxy="'$httpsProxy'"
         export all_proxy="'$allProxy'"
 
+        export SAVE_HTTP_PROXY="'$httpProxy'"
+        export SAVE_HTTPS_PROXY="'$httpsProxy'"
+        export SAVE_ALL_PROXY="'$allProxy'"
+
         ' # END declare=proxyConfig
 
         echo "$proxyConfig" > "$HOME/.bash.local.proxy"
@@ -265,16 +269,20 @@ save_proxy_settings() {
             print_in_white "\n    Proxy set: $HOME/.gemrc.\n"
         fi
 
-        export PROXY_USER="'$proxyUser'"
-        export PROXY_PASS="'$proxyPass'"
+        export PROXY_USER="$proxyUser"
+        export PROXY_PASS="$proxyPass"
 
-        export HTTP_PROXY="'$httpProxy'"
-        export HTTPS_PROXY="'$httpsProxy'"
-        export ALL_PROXY="'$allProxy'"
+        export HTTP_PROXY="$httpProxy"
+        export HTTPS_PROXY="$httpsProxy"
+        export ALL_PROXY="$allProxy"
 
-        export http_proxy="'$httpProxy'"
-        export https_proxy="'$httpsProxy'"
-        export all_proxy="'$allProxy'"
+        export http_proxy="$httpProxy"
+        export https_proxy="$httpsProxy"
+        export all_proxy="$allProxy"
+
+        export SAVE_HTTP_PROXY="$httpProxy"
+        export SAVE_HTTPS_PROXY="$httpsProxy"
+        export SAVE_ALL_PROXY="$allProxy"
     fi
 }
 
@@ -324,4 +332,38 @@ parse_supplied_proxy() {
 change_proxy() {
     ask_proxy_settings
     save_proxy_settings
+}
+
+proxy_on() {
+    export HTTP_PROXY="$SAVE_HTTP_PROXY"
+    export HTTPS_PROXY="$SAVE_HTTPS_PROXY"
+    export ALL_PROXY="$SAVE_ALL_PROXY"
+
+    export http_proxy="$SAVE_HTTP_PROXY"
+    export https_proxy="$SAVE_HTTPS_PROXY"
+    export all_proxy="$SAVE_ALL_PROXY"
+}
+
+proxy_off() {
+    export HTTP_PROXY=""
+    export HTTPS_PROXY=""
+    export ALL_PROXY=""
+
+    export http_proxy=""
+    export https_proxy=""
+    export all_proxy=""
+}
+
+network_wifi() {
+    sudo networksetup -setnetworkserviceenabled "Wi-Fi" "on"
+    sudo networksetup -setnetworkserviceenabled "Ethernet" "off"
+
+    print_success "Switched to WiFi. Ethernet can be unplugged"
+}
+
+network_eth() {
+    sudo networksetup -setnetworkserviceenabled "Wi-Fi" "off"
+    sudo networksetup -setnetworkserviceenabled "Ethernet" "on"
+
+    print_success "WiFi turned off. Please plug in Ethernet"
 }
