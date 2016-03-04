@@ -214,15 +214,17 @@ elif [[ "$os" == 'ubuntu' ]]; then
     }
 
     update() {
-        print_subtle "\nUpdating: please stand by this could take a while"
+        print_lf
+        print_subtle "Updating: please stand by this could take a while"
 
         # Resynchronize the package index files from their sources
-        execute_quietly 'sudo -E apt-get -qq update -y' 'Update'
+        execute 'sudo -E apt-get -qq update -y' 'Update'
 
-        print_subtle "\nUpgrading: please stand by this could take a while"
+        print_lf
+        print_subtle "Upgrading: please stand by this could take a while"
 
         # Install the newest versions of all packages installed
-        execute_quietly 'sudo -E apt-get -qq upgrade -y' 'Upgrade'
+        execute 'sudo -E apt-get -qq upgrade -y' 'Upgrade'
 
         if cmd_exists 'npm'; then
             execute_quietly 'npm install -g npm' 'NPM (update)'
