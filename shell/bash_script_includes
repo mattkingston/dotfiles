@@ -1,0 +1,13 @@
+#!/bin/bash
+
+declare -a includes=(
+   'bash_utils'
+   'bash_extra'
+   'bash.local'
+   'bash.local.proxy'
+)
+
+for i in ${includes[@]}; do
+    [ -f "$HOME/${i}" ] \
+      && source "$HOME/${i}"
+done
