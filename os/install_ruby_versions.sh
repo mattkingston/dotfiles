@@ -75,10 +75,10 @@ export rvm_path=$RVM_DIR
         print_in_white "\n    Proxy set: $HOME/.gemrc.\n"
     fi
 
-    if [ -d "$RVM_DIRECTORY" ]; then
+    if [ -d "$RVM_DIR" ]; then
 
-        [ -s "$RVM_DIRECTORY/scripts/rvm" ] \
-          && source $RVM_DIRECTORY/scripts/rvm
+        [ -s "$RVM_DIR/scripts/rvm" ] \
+          && source $RVM_DIR/scripts/rvm
 
         # Install ruby versions
         for i in ${RUBY_VERSIONS[@]}; do
