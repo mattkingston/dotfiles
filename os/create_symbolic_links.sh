@@ -17,6 +17,7 @@ declare -a FILES_TO_SYMLINK=(
     'shell/bash_prompt'
     'shell/bash_profile'
     'shell/bash_utils'
+    'shell/bash_script_includes'
 
     'shell/curlrc'
 
