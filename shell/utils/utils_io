@@ -24,7 +24,7 @@ is_no() {
 
 ask() {
     print_question "$1"
-    read
+    read "$2"
 }
 
 ask_silent() {

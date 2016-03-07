@@ -8,11 +8,9 @@ declare -r origin="http://github.com/mattkingston/dotfiles.git"
 declare -r installDir="$HOME/projects/dotfiles"
 
 if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
-    declare -r tarballUrl="$(dirname $BASH_SOURCE[0])"
-    declare extracted="YES"
+    declare -r archive="$(dirname $BASH_SOURCE[0])"
 else
-    declare -r tarballUrl="http://github.com/mattkingston/dotfiles/tarball/master"
-    declare extracted="NO"
+    declare -r archive="http://github.com/mattkingston/dotfiles/tarball/master"
 fi
 
 declare -a argumentList=( "$@" )
@@ -23,21 +21,23 @@ declare suppliedProxy=""
 
 declare debug="NO"
 
-for i in ${argumentList[@]}; do
-    if [ "$i" == '--proxy' ]; then
-        isProxySupplied="YES"
-    fi
-done
+if [ "$argumentListLength" -gt 0 ]; then
+    for i in ${argumentList[@]}; do
+        if [ "$i" == '--proxy' ]; then
+            isProxySupplied="YES"
+        fi
+    done
 
-for i in `seq 0 $argumentListLength`; do
-    if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
-        suppliedProxy="${argumentList[$i+1]}"
-    fi
+    for i in `seq 0 $argumentListLength`; do
+    	if [[ "${argumentList[$i]}" == '--proxy' && $i+1 -le "$argumentListLength" ]]; then
+            suppliedProxy="${argumentList[$i+1]}"
+    	fi
 
-    if [[ "${argumentList[$i]}" == '--debug' ]]; then
-        debug="YES"
-    fi
-done
+    	if [[ "${argumentList[$i]}" == '--debug' ]]; then
+            debug="YES"
+        fi
+    done
+fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -59,37 +59,30 @@ main() {
 
     # Download dotfiles to a temporary location
 
-    if [[ "$extracted" == "YES" ]]; then
-        source "$(dirname $BASH_SOURCE[0])/shell/bash_utils"
-    else
+    if [[ -f "$archive" && "$archive" == *".tar"* ]]; then
+        cp "$archive" "$tmpFile"
 
-        if [[ "$tarballUrl" == "http"* ]]; then
-            if command -v 'curl' &> /dev/null; then
-                curl -LksSo "$tmpFile" "$tarballUrl" &> /dev/null
-            elif command -v 'wget' &> /dev/null; then
-                wget --no-check-certificate -qO "$tmpFile" "$tarballUrl" &> /dev/null
-            else
-                echo "curl or wget required. Cannot continue"
-                exit 1
-            fi
-
-            if command -v 'tar' &> /dev/null; then
-                tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" &> /dev/null
-            fi
+        if command -v 'tar' &> /dev/null; then
+            tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" &> /dev/null
+        fi
+    elif [[ -d "$archive" ]]; then
+        cp -r "$archive/." "$tmpDir/"
+    elif [[ "$archive" == "http"* ]]; then
+        if command -v 'curl' &> /dev/null; then
+            curl -LksSo "$tmpFile" "$archive"
+        elif command -v 'wget' &> /dev/null; then
+            wget --no-check-certificate -qO "$tmpFile" "$archive"
         else
-            if [[ -f "$tarballUrl" && "$tarballUrl" == *".tar"* ]]; then
-                cp "$tarballUrl" "$tmpFile"
-
-                if command -v 'tar' &> /dev/null; then
-                    tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir" &> /dev/null
-                fi
-            elif [[ -d "$tarballUrl" ]]; then
-                cp -r "$tarballUrl/." "$tmpDir/"
-            fi
+            echo "curl or wget required. Cannot continue"
+            exit 1
         fi
 
-        source "$tmpDir/shell/bash_utils"
+        if command -v 'tar' &> /dev/null; then
+            tar -zxf "$tmpFile" --strip-components 1 -C "$tmpDir"
+        fi
     fi
+
+    source "$tmpDir/shell/bash_utils"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -98,6 +91,18 @@ main() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     ask_for_sudo
+
+    skipSave="NO"
+
+    if [[ -d "$(dirname $BASH_SOURCE[0])/os" ]]; then
+        ask_for_confirmation "Do you just want to run this installer without saving to a different directory?"
+
+        if answer_is_yes; then
+            skipSave="YES"
+        fi
+    fi
+
+    if [ "$skipSave" == "NO" ]; then
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -109,7 +114,7 @@ main() {
       newInstallDir=''
 
       while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
-        ask 'Please specify another location for the base dotfiles (absolute path): '
+        ask 'Please specify another location for the base dotfiles (absolute path): ' '-e'
 
         newInstallDir="$(get_answer)"
       done
@@ -129,7 +134,7 @@ main() {
         newInstallDir=''
 
         while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
-          ask 'Please specify another location for the base dotfiles (absolute path): '
+          ask 'Please specify another location for the base dotfiles (absolute path): ' '-e'
 
           newInstallDir="$(get_answer)"
 
@@ -162,6 +167,8 @@ main() {
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     cd "$newInstallDir"
+
+    fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -199,12 +206,12 @@ main() {
     # Save dotfiles location for later
 
     DOTFILES_CONFIGS='
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # Dotfiles
+# Dotfiles
 
-    export DOTFILES_DIR="'$newInstallDir'"
-    '
+export DOTFILES_DIR="'$newInstallDir'"
+'
 
     append_to_file_once "$HOME/.bash.local" "$DOTFILES_CONFIGS"
 
@@ -358,6 +365,48 @@ main() {
         append_to_file_once "$HOME/.bash.local" "$githubConfig"
 
         print_in_white "\n    GitHub variables have been set in $HOME/.bash.local. You can change these any time by modifying this file\n\n"
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Configure AWS CLI
+
+    if [ package_is_installed 'aws' ]; then
+        print_info 'AWS'
+
+        ask_for_confirmation 'Do you want to configure AWS credentials now?'
+
+        if answer_is_yes; then
+            aws configure
+        fi
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Battle.net setup
+
+    if [ -f "/opt/homebrew-cask/Caskroom/battle-net/latest/Battle.net-Setup-enUS.app" ]; then
+        print_info 'Battle.net'
+
+        ask_for_confirmation 'Do you want to set up Battle.net now?'
+
+        if answer_is_yes; then
+            "/opt/homebrew-cask/Caskroom/battle-net/latest/Battle.net-Setup-enUS.app"
+        fi
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # uTorrent setup
+
+    if [ -f "/opt/homebrew-cask/Caskroom/utorrent/latest/uTorrent.app" ]; then
+        print_info 'Battle.net'
+
+        ask_for_confirmation 'Do you want to set up uTorrent now?'
+
+        if answer_is_yes; then
+            "/opt/homebrew-cask/Caskroom/utorrent/latest/uTorrent.app"
+        fi
     fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

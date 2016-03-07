@@ -32,6 +32,18 @@ enable_programmable_completion() {
 
     fi
 
+    # Homebrew completion
+
+    if [ "$OS" == 'osx' ] && [ -f "/usr/local/etc/bash_completion.d" ]; then
+        source "/usr/local/etc/bash_completion.d"
+    fi
+
+    # AWS Cli completion
+
+    if [ package_is_installed 'aws' ]; then
+        complete -C aws_completer aws
+    fi
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     [ -f "$NVM_DIR/bash_completion" ] \

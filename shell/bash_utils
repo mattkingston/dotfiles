@@ -1,9 +1,13 @@
 #!/bin/bash
 
-if [[ "$(uname -s)" == "Darwin" ]]; then
-    trueSource="$(readlink $BASH_SOURCE)"
+if [ -L "$BASH_SOURCE" ]; then
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        trueSource="$(readlink $BASH_SOURCE)"
+    else
+        trueSource="$(readlink -f $BASH_SOURCE)"
+    fi
 else
-    trueSource="$(readlink -f $BASH_SOURCE)"
+   trueSource="$(dirname $BASH_SOURCE)"
 fi
 
 if [ -d "$trueSource" ]; then

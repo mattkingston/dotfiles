@@ -40,6 +40,7 @@ install_homebrew_casks() {
             install_package 'ImageOptim' 'imageoptim' 'cask'
             install_package 'LICEcap' 'licecap' 'cask'
             install_package 'Unarchiver' 'the-unarchiver' 'cask'
+            install_package 'Keyboard Cleaner' 'keyboard-cleaner' 'cask'
         fi
 
         # Security
@@ -74,6 +75,7 @@ install_homebrew_casks() {
             install_package 'Day One (cli)' 'dayone-cli' 'cask'
             install_package 'Evernote' 'evernote' 'cask'
             install_package 'Things' 'things' 'cask'
+            install_package 'Adobe Reader' 'adobe-reader' 'cask'
         fi
 
         # Business
@@ -83,6 +85,12 @@ install_homebrew_casks() {
         if answer_is_yes; then
             install_package 'Microsoft Office' 'microsoft-office' 'cask'
             install_package 'YNAB' 'ynab' 'cask'
+        fi
+
+        ask_for_confirmation "Do you want to install Adobe Cloud?"
+
+        if answer_is_yes; then
+            install_package 'Adobe Cloud' 'adobe-creative-cloud' 'cask'
         fi
 
         # Programming IDE
