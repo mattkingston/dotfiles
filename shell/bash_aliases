@@ -17,6 +17,8 @@ alias ip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+os="$(get_os)"
+
 if [ "$os" == 'osx' ]; then
     alias local-ip='ipconfig getifaddr en1'
 elif [ "$os" == 'ubuntu' ]; then
@@ -92,9 +94,3 @@ if [ "$os" == 'osx' ]; then
 elif [ "$os" == 'ubuntu' ]; then
     alias o='xdg-open'
 fi
-
-# ----------------------------------------------------------------------
-
-# Unset anything that just pollutes the global space
-
-unset OS

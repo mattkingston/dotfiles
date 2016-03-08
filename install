@@ -114,7 +114,7 @@ main() {
       newInstallDir=''
 
       while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
-        ask 'Please specify another location for the base dotfiles (absolute path): ' '-e'
+        ask_env 'Please specify another location for the base dotfiles (absolute path): '
 
         newInstallDir="$(get_answer)"
       done
@@ -134,7 +134,7 @@ main() {
         newInstallDir=''
 
         while [[ -z "$newInstallDir" || "$newInstallDir" == "" ]]; do
-          ask 'Please specify another location for the base dotfiles (absolute path): ' '-e'
+          ask_env 'Please specify another location for the base dotfiles (absolute path): '
 
           newInstallDir="$(get_answer)"
 
