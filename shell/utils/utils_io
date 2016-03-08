@@ -24,7 +24,12 @@ is_no() {
 
 ask() {
     print_question "$1"
-    read "$2"
+
+    if [ -z "$2" ]; then
+        read "$2"
+    else
+        read
+    fi
 }
 
 ask_silent() {
