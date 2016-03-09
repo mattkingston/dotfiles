@@ -251,3 +251,24 @@ update_dotfiles() {
     cd "$workingDirectory"
 
 }
+
+git_status_all() {
+lfn=0; for f in *; do if [ ${#f} -gt $lfn ]; then lfn=${#f}; fi done; printf "\n\e[38;5;240mDIR%${lfn}s    BRANCH (* indicates dirty)\e[0m\n\n" &&
+find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '\
+(cd {} \
+&& [ -d "./.git" ] \
+&& (\
+! $(git diff --quiet --ignore-submodules --cached) \
+|| ! $(git diff-files --quiet --ignore-submodules --) \
+|| [ -n "$(git ls-files --others --exclude-standard)" ] \
+) && printf "$(printf "\e[38;5;226m{}\t-\t$(printf "$(git rev-parse --abbrev-ref HEAD 2> /dev/null || git rev-parse --short HEAD 2> /dev/null || printf " (unknown)")" | tr -d "\n" )\e[0m" ) \e[38;5;226m*\e[0m\n" \
+|| (\
+[ -d "./.git" ] \
+&& printf "$(printf "\e[38;5;082m{}\t-\t$(printf "$(git rev-parse --abbrev-ref HEAD 2> /dev/null || git rev-parse --short HEAD 2> /dev/null || printf " (unknown)")" | tr -d "\n" )\e[0m" )\n"\
+|| printf "$(printf "\e[38;5;240m{}\t-\tnot a git repo")\n"\
+)\
+)' \; | column -ts $'\t' && printf "\n"
+}
+
+
+
