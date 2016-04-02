@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+declare error=""
+
+if [[ -n "$1" ]]; then
+  error="$1"
+else
+  read -t 1 error
+fi
+
+[[ "$error" == "" ]] && exit 1
+
+if [[ ! -e ~/.dotfiles.log ]]; then
+  touch ~/.dotfiles.log
+fi
+
+echo "$(date "+%Y/%m/%d %H:%M:%S"): ${error}" >> ~/.dotfiles.log
+
+printf "$(tput setaf 124)%s$(tput sgr0)" "An error occurred internally - check ~/.dotfiles.log for details"
+
+unset error

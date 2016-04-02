@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+[[ -e ~/.dotfiles/bash/options.sh ]] && . ~/.dotfiles/bash/options.sh
+[[ -e ~/.dotfiles/bash/exports.sh ]] && . ~/.dotfiles/bash/exports.sh
+
+[[ -e "${BASH_RC_LOCAL}" ]] && . "${BASH_RC_LOCAL}"
+
+[[ -e ~/.dotfiles/bash/aliases.sh ]] && . ~/.dotfiles/bash/aliases.sh
+[[ -e ~/.dotfiles/bash/autocomplete.sh ]] && . ~/.dotfiles/bash/autocomplete.sh
+[[ -e ~/.dotfiles/bash/prompt.sh ]] && . ~/.dotfiles/bash/prompt.sh

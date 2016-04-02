@@ -1,0 +1,9 @@
+nvm/
+rvm/
+
+vim/plugins/*
+vim/undos/*
+vim/swaps/*
+vim/backups/*
+
+bin/webs

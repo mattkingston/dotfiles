@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+[[ -e ~/.dotfiles/bash/options.sh ]] && . ~/.dotfiles/bash/options.sh
+[[ -e ~/.dotfiles/bash/exports.sh ]] && . ~/.dotfiles/bash/exports.sh
+
+[[ -e "${BASH_RC_LOCAL}" ]] && . "${BASH_RC_LOCAL}"
+
+[[ -e ~/.dotfiles/bash/autocomplete.sh ]] && . ~/.dotfiles/bash/autocomplete.sh
+
+if [[ -n "$1" && -f ~/.dotfiles/lib/"${1}".sh ]]; then
+  . ~/.dotfiles/lib/"${1}".sh;
+  shift
+else
+  for file in ~/.dotfiles/lib/*; do
+    [[ -f "${file}" ]] \
+      && . "$file"
+  done
+
+  if [[ "$(get_os)" == "osx" ]]; then
+    for osx_file in ~/.dotfiles/lib/osx/*; do
+      [[ -f "${osx_file}" ]] \
+        && . "${osx_file}"
+    done
+  elif [[ "$(get_os)" == "ubuntu" ]]; then
+    for ubuntu_file in ~/.dotfiles/lib/ubuntu/*; do
+      [[ -f "${ubuntu_file}" ]] \
+        && . "${ubuntu_file}"
+    done
+  fi
+
+  for file in ~/.dotfiles/lib/*; do
+    [[ -f "${file}" ]] \
+      && . "$file"
+  done
+fi
+
+if (($#)); then
+  CMD="$1"
+  shift
+
+  if type -t "${CMD}" > /dev/null; then
+    "${CMD}" "$@"
+  fi
+fi
