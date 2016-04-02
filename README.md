@@ -68,10 +68,10 @@ I would like to thank the following superb developers for their ideas, and
 great code which I was able to learn from, extend upon and in some areas
 shamelessly copy.
 
-[Cătălin Mariș dotfiles](https://github.com/alrra/dotfiles)
-[Mathias Bynens dotfiles](https://github.com/mathiasbynens/dotfiles)
-[Paul Irish dotfiles](https://github.com/paulirish/dotfiles)
-[Ben Alman dotfiles](https://github.com/cowboy/dotfiles)
+* [Cătălin Mariș dotfiles](https://github.com/alrra/dotfiles)
+* [Mathias Bynens dotfiles](https://github.com/mathiasbynens/dotfiles)
+* [Paul Irish dotfiles](https://github.com/paulirish/dotfiles)
+* [Ben Alman dotfiles](https://github.com/cowboy/dotfiles)
 
 ## License
 
