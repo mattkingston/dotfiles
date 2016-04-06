@@ -6,13 +6,13 @@ export HOST_NAME="laptop.local"
 
 export BASH_RC_LOCAL=~/.bashrc.local
 
-if [[ "$(uname -s)" =~ ^Darwin ]]; then
+if [[ "$(uname -s)" == "Darwin" ]]; then
   export OS="osx"
-  export DOTFILES_DIR="$(readlink ~/.dotfiles)"
 else
   export OS="ubuntu"
-  export DOTFILES_DIR="$(readlink -f ~/.dotfiles)"
 fi
+
+export DOTFILES_DIR=~/.dotfiles
 
 # Dotfiles bin path
 PATH=$DOTFILES_DIR/bin:/usr/local/bin:$PATH
@@ -43,7 +43,10 @@ export GIT_CONF_LOCAL=~/.gitconfig.local
 export CURL_RC=~/.curlrc
 
 export DIR_COLORS=~/.dircolors
-export TMUX_CONF=~/.tmux.conf
+
+if [[ -f ~/.dotfiles/.tmux_installed ]]; then
+  export TMUX_CONF=~/.tmux.conf
+fi
 
 export NVM_NODEJS_ORG_MIRROR=http://nodejs.org/dist
 export NVM_DIR="$DOTFILES_DIR"/nvm
@@ -52,18 +55,20 @@ export NPM_RC=~/.npmrc
 export RVM_DIR="$DOTFILES_DIR"/rvm
 export GEM_RC=~/.gemrc
 
-export VIM_DIR="$DOTFILES_DIR"/vim
+if [[ -f ~/.dotfiles/.vim_installed ]]; then
+  export VIM_DIR="$DOTFILES_DIR"/vim
 
-export MYVIMRC=~/.vimrc
-export MYVIMRC_LOCAL=~/.vimrc.local
+  export MYVIMRC=~/.vimrc
+  export MYVIMRC_LOCAL=~/.vimrc.local
 
-export MYGVIMRC=~/.gvimrc
-export MYGVIMRC_LOCAL=~/.gvimrc.local
+  export MYGVIMRC=~/.gvimrc
+  export MYGVIMRC_LOCAL=~/.gvimrc.local
 
-export VIMINIT="source $MYVIMRC"
+  export VIMINIT="source $MYVIMRC"
 
-# Make vim the default editor
-export EDITOR='vim'
+  # Make vim the default editor
+  export EDITOR='vim'
+fi
 
 # Ignore commands that start with spaces and duplicates
 export HISTCONTROL=ignoreboth

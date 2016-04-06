@@ -167,16 +167,13 @@ ubuntu_install_applications() {
     apt_install 'Git' 'git'
   fi
 
-  if [[ "${install_git}" == true ]]; then
-    apt_install 'Git' 'git'
-  fi
-
   if [[ "${install_curl}" == true ]]; then
     apt_install 'cURL' 'curl'
   fi
 
   if [[ "${install_tmux}" == true ]]; then
     apt_install 'tmux' 'tmux'
+    touch ~/.dotfiles/.tmux_installed
   fi
 
   if [[ "${install_vim}" == true ]]; then
