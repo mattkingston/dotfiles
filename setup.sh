@@ -46,6 +46,10 @@ setup() {
       printf "\e[38;5;124m%s\n\e[0m" "'tar' binary required"
       exit 1
     else
+      if [[ ! -d ~/.dotfiles ]]; then
+        mkdir ~/.dotfiles
+      fi
+
       tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles &> /dev/null
 
       if [[ "$?" -eq 1 ]]; then
