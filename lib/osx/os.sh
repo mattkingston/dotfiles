@@ -8,13 +8,17 @@ brew_install() {
   local formula_name="${1}"
 
   if [[ "$command" == "" ]]; then
-    brew list $formula > /dev/null \
+    brew list $formula | dotfiles_log
+
+    [[ "${PIPESTATUS[0]}" -eq 0 ]] \
       && print_success "${formula_name}" \
-      || execute "brew $command install $formula" "${formula_name}"
+      || execute "brew $command install $formula | dotfiles_log" "${formula_name}"
   else
-    brew $command list $formula > /dev/null \
+    brew $command list $formula | dotfiles_log
+
+    [[ "$PIPESTATUS[0]" -eq 0 ]] \
       && print_success "${formula_name}" \
-      || execute "brew $command install $formula" "${formula_name}"
+      || execute "brew $command install $formula | dotfiles_log" "${formula_name}"
   fi
 }
 
@@ -23,23 +27,27 @@ brew_link() {
   local formula="${2}"
   local formula_name="${1}"
 
-  brew list $formula > /dev/null \
-    && execute "brew link $formula" "$formula_name"
+  brew list $formula | dotfiles_log
+
+  [[ "$PIPESTATUS[0]" -eq 0 ]] \
+    && execute "brew link $formula | dotfiles_log" "$formula_name"
 }
 
 brew_tap() {
   local repository="$1"
 
-  brew tap | grep -q "$repository" > /dev/null \
+  brew tap | grep -q "$repository" \
     && print_success "tap: ${repository}" \
-    || execute "brew tap ${repository}" "tap: ${repository}"
+    || execute "brew tap ${repository} | dotfiles_log" "tap: ${repository}"
 }
 
 brew_list() {
   local command="${2}"
   local formula="${1}"
 
-  brew $command list $formula > /dev/null \
+  brew $command list $formula | dotfiles_log
+
+  [[ "$PIPESTATUS[0]" -eq 0 ]] \
     && return 0 \
     || return 1;
 }
@@ -53,7 +61,7 @@ update_osx() {
 }
 
 update_brew() {
-  execute 'brew update' 'brew (update)'
-  execute 'brew upgrade --all' 'brew (upgrade)'
-  execute 'brew cleanup' 'brew (cleanup)'
+  execute 'brew update | dotfiles_log' 'brew (update)'
+  execute 'brew upgrade --all | dotfiles_log' 'brew (upgrade)'
+  execute 'brew cleanup | dotfiles_log' 'brew (cleanup)'
 }

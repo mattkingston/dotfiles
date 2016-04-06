@@ -184,22 +184,27 @@ ask_proxy_settings() {
 
 save_proxy_settings_to_apt() {
   if is_ubuntu; then
-    echo "Acquire::http::Proxy ${http_proxy};" | sudo tee "${APT_RC}" &> /dev/null
+    echo "Acquire::http::Proxy \"${http_proxy};\"" | sudo tee "${APT_RC}" &> /dev/null
+    echo "appended http proxy to ${APT_RC}" | dotfiles_log
+
+    echo "Acquire::https::Proxy \"${https_proxy};\"" | sudo tee "${APT_RC}" &> /dev/null
+    echo "appended https proxy to ${APT_RC}" | dotfiles_log
+
     print_success "Proxy set: ${APT_RC}"
   fi
 }
 
 save_proxy_settings_to_npm() {
   if command -v 'npm' > /dev/null; then
-    execute "npm config --global set proxy ${http_proxy}" "NPM HTTP Proxy"
-    execute "npm config --global set https-proxy ${https_proxy}" "NPM HTTPS Proxy"
+    execute "npm config --global set proxy ${http_proxy} | dotfiles_log" "NPM HTTP Proxy"
+    execute "npm config --global set https-proxy ${https_proxy} | dotfiles_log" "NPM HTTPS Proxy"
   fi
 }
 
 save_proxy_settings_to_git() {
   if command -v 'git' > /dev/null; then
-    execute "git config --global http.proxy ${http_proxy}" "Git HTTP Proxy"
-    execute "git config --global https.proxy ${https_proxy}" "Git HTTPS Proxy"
+    execute "git config --global http.proxy ${http_proxy} | dotfiles_log" "Git HTTP Proxy"
+    execute "git config --global https.proxy ${https_proxy} | dotfiles_log" "Git HTTPS Proxy"
   fi
 }
 
@@ -231,7 +236,7 @@ save_proxy_settings_to_bash() {
     content_block_remove "Proxy" "${BASH_RC_LOCAL}"
   fi
 
-  local proxy_stream="$(content_block_stream_new 'Proxy')"
+  local proxy_stream="$(content_block_stream_new Proxy)"
 
   stream_add "${proxy_stream}" "export proxy_user=\"'${proxy_user}'\""
   stream_add "${proxy_stream}" "export proxy_pass=\"'${proxy_pass}'\""

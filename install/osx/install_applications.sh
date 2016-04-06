@@ -243,6 +243,7 @@ osx_install_applications() {
 
   if [[ "${install_tmux}" == true ]]; then
     brew_install 'tmux' 'tmux'
+    touch ~/.dotfiles/.tmux_installed
   fi
 
   if [[ "${install_zopfli}" == true ]]; then
@@ -258,6 +259,7 @@ osx_install_applications() {
 
   if [[ "${install_vim}" == true ]]; then
     brew_install 'Vim' 'vim --override-system-vi'
+    touch ~/.dotfiles/.vim_installed
   fi
 
   if [[ "${install_openssl}" == true ]]; then
@@ -352,8 +354,8 @@ osx_install_applications() {
     fi
   fi
 
-  execute 'brew cleanup' 'brew (cleanup)'
-  execute 'brew cask cleanup' 'brew cask (cleanup)'
+  execute 'brew cleanup | dotfiles_log' 'brew (cleanup)'
+  execute 'brew cask cleanup | dotfiles_log' 'brew cask (cleanup)'
 
   cd "${pwd}"
 }

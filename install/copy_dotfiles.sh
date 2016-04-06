@@ -29,23 +29,30 @@ copy_dotfiles() {
   fi
 
   for i in "${dotfiles[@]}"; do
-    if [[ ("${1}" == "vimrc" || "${1}" == "gvimrc") && ! -f ~/.dotfiles/.vim_installed ]]; then
+    if [[ "${i}" == "vimrc" && ! -e ~/.dotfiles/.vim_installed ]]; then
+      echo "Skipped vimrc because VIM was not installed using setup" | dotfiles_log
       continue
     fi
 
-    if [[ "${1}" == "tmux.conf" && ! -f ~/.dotfiles/.tmux_installed ]]; then
+    if [[ "${i}" == "gvimrc" && ! -e ~/.dotfiles/.vim_installed ]]; then
+      echo "Skipped gvimrc because VIM was not installed using setup" | dotfiles_log
+      continue
+    fi
+
+    if [[ "${i}" == "tmux.conf" && ! -e ~/.dotfiles/.tmux_installed ]]; then
+      echo "Skipped tmux.conf because Tmux was not installed using setup" | dotfiles_log
       continue
     fi
 
     if [[ -e ~/."${i}" && -n "${backup_dir}" ]]; then
       if [[ ! -d "${backup_dir}" ]]; then
-        mkdir "${backup_dir}"
+        mkdir -v "${backup_dir}" | dotfiles_log
       fi
 
-      mv ~/."${i}" "${backup_dir}/dotfiles"
+      mv -v ~/."${i}" "${backup_dir}/dotfiles" | dotfiles_log
     fi
 
-    cp ./dotfiles/"${i}" ~/."${i}"
+    cp -v ./dotfiles/"${i}" ~/."${i}" | dotfiles_log
   done
 
   cd "${pwd}"

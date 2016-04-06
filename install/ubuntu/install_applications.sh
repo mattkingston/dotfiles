@@ -15,7 +15,6 @@ ubuntu_install_applications() {
   local install_vim=false
   local install_xclip=false
   local install_zip=false
-  local install_ant=false
   local install_ssh=false
 
   local git_username=""
@@ -32,7 +31,6 @@ ubuntu_install_applications() {
     install_vim=true
     install_xclip=true
     install_zip=true
-    install_ant=true
     install_ssh=true
   else
     ask_for_confirmation "Do you want to install Bash 4.3?";
@@ -83,12 +81,6 @@ ubuntu_install_applications() {
       install_zip=true
     fi
 
-    ask_for_confirmation "Do you want to install Apache Ant?";
-
-    if answer_is_yes; then
-      install_ant=true
-    fi
-
     ask_for_confirmation "Do you want to install SSH Pass?";
 
     if answer_is_yes; then
@@ -96,20 +88,14 @@ ubuntu_install_applications() {
     fi
   fi
 
-  update_ubuntu
-
-  # Simple configuration storage system
-  apt_install 'GSettings' 'libglib2.0-bin'
-
-  # Tools for compiling/building software from source
-  apt_install 'Build Essential' 'build-essential'
+  #update_ubuntu
 
   # GnuPG archive keys of the Debian archive
-  apt_install 'GnuPG archive keys' 'debian-archive-keyring'
+  # apt_install 'GnuPG archive keys' 'debian-archive-keyring' 
 
-  apt_install 'Common Software Properties' 'software-properties-common'
+  # apt_install 'Common Software Properties' 'software-properties-common' # installs python (v3) & common-ca-certificates
 
-  apt_install 'Python Software Properties' 'python-software-properties'
+  # apt_install 'Python Software Properties' 'python-software-properties'
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -117,7 +103,7 @@ ubuntu_install_applications() {
   # Required for latest git version (default apt version is 1.7 - too low)
   # Required for java core team ppa
 
-  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" > /dev/null 2>&1
+  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" | dotfiles_log
 
   if [[ "${install_git}" == true ]]; then
     if ! is_callable 'git'; then
@@ -129,33 +115,36 @@ ubuntu_install_applications() {
   update_ubuntu
 
   if [[ "${install_bash4x}" == true ]]; then
-    wget --no-check-certificate -qO ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
+    # Tools for compiling/building software from source
+    apt_install 'Build Essential' 'build-essential' # Installs make, which is used for bash 4.3 setup
+
+    wget --no-check-certificate -O ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" | dotfiles_log
 
     if [[ "$?" -ne 1 ]]; then
       if grep -q 'Not found' ~/.bash-4.3.tar.gz; then
         print_error "Downloading bash 4.3 tarball failed"
       fi
 
-      tar -xf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &> /dev/null
+      tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 | dotfiles_log
 
       if [[ "$?" -eq 1 ]]; then
         print_error "Extracting tarball failed"
       else
-        cd ~/.bash-4.3
+        cd -v ~/.bash-4.3 | dotfiles_log
 
-        ./configure &> /dev/null
+        ./configure | dotfiles_log
 
-        make &> /dev/null
-        sudo make install &> /dev/null
+        make | dotfiles_log
+        sudo make install | dotfiles_log
 
-        print_success "Bash 4.3"
+        print_result "$PIPESTATUS[0]" "Bash 4.3"
 
-        chsh -s "/bin/bash" &> /dev/null
+        chsh -s "/bin/bash" | dotfiles_log
 
         print_result $? 'Set version of Bash to use 4.3'
 
-        rm ~/.bash-4.3.tar.gz &> /dev/null
-        rm -R ~/.bash-4.3 &> /dev/null
+        rm ~/.bash-4.3.tar.gz | dotfiles_log
+        rm -R ~/.bash-4.3 | dotfiles_log
 
         cd "$(dirname "${0}")"
       fi
@@ -174,11 +163,13 @@ ubuntu_install_applications() {
   if [[ "${install_tmux}" == true ]]; then
     apt_install 'tmux' 'tmux'
     touch ~/.dotfiles/.tmux_installed
+    echo "created: ~/.dotfiles/.tmux_installed" | dotfiles_log
   fi
 
   if [[ "${install_vim}" == true ]]; then
     apt_install 'GNOME Vim' 'vim-gnome'
     touch ~/.dotfiles/.vim_installed
+    echo "created: ~/.dotfiles/.vim_installed" | dotfiles_log
   fi
 
   if [[ "${install_xclip}" == true ]]; then
@@ -187,10 +178,6 @@ ubuntu_install_applications() {
 
   if [[ "${install_zip}" == true ]]; then
     apt_install 'Zip' 'zip'
-  fi
-
-  if [[ "${install_ant}" == true ]]; then
-    apt_install 'Apache Ant' 'ant'
   fi
 
   if [[ "${install_ssh}" == true ]]; then

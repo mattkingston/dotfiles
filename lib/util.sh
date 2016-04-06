@@ -27,11 +27,11 @@ is_interactive_session() {
 
 cmd_exists() {
   command -v "${1}" > /dev/null
-  return $?
+  return "$?"
 }
 
 fn_exists() {
-  type -t "${1}" &> /dev/null \
+  type -t "${1}" > /dev/null \
     && return 0 \
     || return 1
 }
@@ -45,11 +45,9 @@ is_callable() {
 }
 
 execute() {
-  eval "${1}" &> /dev/null
+  eval "${1}"
 
-  local succeeded="$?"
-
-  if [[ "$?" -eq 0 ]]; then
+  if [[ "$PIPESTATUS[0]" -eq 0 ]]; then
     print_success "${2}"
     return 0
   fi

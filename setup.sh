@@ -9,25 +9,28 @@ setup() {
   local pwd="$(pwd)"
   local backup_suffix="$(date +%Y-%m-%d-%H-%M-%S)"
 
+  echo "" > ~/.dotfiles.log # Truncate log before each attempt
+  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $backup_suffix ----" | tee ~/.dotfiles.log &> /dev/null
+
   if [[ "$BASH_SOURCE" == "" ]]; then
     # Backup first
     if [[ -e ~/.dotfiles ]]; then
-      mv ~/.dotfiles ~/.dotfiles.backup-"$backup_suffix"
+      mv -v ~/.dotfiles ~/.dotfiles.backup-"$backup_suffix" | tee ~/.dotfiles.log &> /dev/null
     fi
 
     # Download tarball
     if command -v 'curl' > /dev/null; then
-      curl -LsSko ~/.dotfiles.tar.gz "${TARBALL_URL}"
+      curl -Lko ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
 
       if [[ "$?" -ne 1 ]]; then
-        if grep -q 'Not found' ~/.dotfiles.tar.gz; then
+        if grep 'Not found' ~/.dotfiles.tar.gz | tee ~/.dotfiles.log &> /dev/null; then
           printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
           exit 1
         fi
       fi
 
     elif command -v 'wget' > /dev/null; then
-      wget --no-check-certificate -qO ~/.dotfiles.tar.gz "${TARBALL_URL}"
+      wget --no-check-certificate -O ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
 
       if [[ "$?" -ne 1 ]]; then
         if grep -q 'Not found' ~/.dotfiles.tar.gz; then
@@ -47,10 +50,10 @@ setup() {
       exit 1
     else
       if [[ ! -d ~/.dotfiles ]]; then
-        mkdir ~/.dotfiles
+        mkdir -v ~/.dotfiles | tee ~/.dotfiles.log &> /dev/null
       fi
 
-      tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles &> /dev/null
+      tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles | tee ~/.dotfiles.log &> /dev/null
 
       if [[ "$?" -eq 1 ]]; then
         printf "\e[38;5;124m%s\n\e[0m" "Extracting tarball failed"
@@ -75,6 +78,7 @@ setup() {
 
   if [[ ! -e "${BASH_RC_LOCAL}" ]]; then
     touch "${BASH_RC_LOCAL}"
+    echo "created $BASH_RC_LOCAL" | dotfiles_log
     print_result $? "${BASH_RC_LOCAL}"
   fi
 
@@ -98,6 +102,7 @@ setup() {
   for i in "${local[@]}"; do
     if [[ ! -e ~/."${i}" ]]; then
       touch ~/."${i}"
+      echo "created ~/.$i" | dotfiles_log
       print_result $? "~/.${i}"
     fi
   done
@@ -133,11 +138,27 @@ setup() {
         ask_proxy_settings && save_proxy_settings
       fi
     fi
+
+    ask_for_confirmation 'Do you want to use insecure curl (helpful if you are behind a MiM proxy server)?'
+
+    if answer_is_yes; then
+      if ! grep -q "insecure" "$CURL_RC"; then
+        echo "insecure" >> "$CURL_RC"
+      fi
+    fi
   else
     ask_for_confirmation 'Do you want to set up Proxy details now?'
 
     if answer_is_yes; then
       ask_proxy_settings && save_proxy_settings
+    fi
+
+    ask_for_confirmation 'Do you want to use insecure curl (helpful if you are behind a MiM proxy server)?'
+
+    if answer_is_yes; then
+      if ! grep -q "insecure" "$CURL_RC"; then
+        echo "insecure" >> "$CURL_RC"
+      fi
     fi
   fi
 
@@ -187,14 +208,14 @@ setup() {
       done
     fi
 
-    git config --file "$GIT_CONF_LOCAL" http.sslverify false
+    git config --file "$GIT_CONF_LOCAL" http.sslverify false | dotfiles_log
 
     if [[ "$git_username" != "" ]]; then
-      git config --file "$GIT_CONF_LOCAL" user.name "$git_username"
+      git config --file "$GIT_CONF_LOCAL" user.name "$git_username" | dotfiles_log
     fi
 
     if [[ "$git_email" != "" ]]; then
-      git config --file "$GIT_CONF_LOCAL" user.email "$git_email"
+      git config --file "$GIT_CONF_LOCAL" user.email "$git_email" | dotfiles_log
     fi
   fi
 
@@ -269,16 +290,16 @@ setup() {
   ssh -T git@github.com &> /dev/null
 
   if [[ $? -ne 1 ]]; then
-    if ! is_running_locally && cmd_exists 'git' && ! is_git_repository; then
-      if [[ "$(git config --get remote.origin.url)" != "$(get_dotfiles_origin)" ]]; then
+    if [[ "$BASH_SOURCE" == "" ]] && command -v 'git' && ! is_git_repository; then
+      if [[ "$(git config --get remote.origin.url)" != "$GIT_REMOTE" ]]; then
         print_subtitle "Dotfiles"
 
         print_info 'Initialize Git repository'
 
-        git init &> /dev/null \
-          && git remote add origin "$(get_dotfiles_origin)" &> /dev/null
+        git init | dotfiles_log
+        git remote add origin "$GIT_REMOTE" | dotfiles_log
 
-        print_result $? 'Initialize the Git repository'
+        print_result "$PIPESTATUS[0]" 'Initialize the Git repository'
       fi
     fi
   fi

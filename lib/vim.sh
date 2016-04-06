@@ -16,11 +16,13 @@ vim_reinstall_plugins() {
     exit 1
   fi
 
-  rm -rf "${VIM_DIR}/plugins/Vundle.vim" &> /dev/null \
-    && git clone -q "https://github.com/gmarik/Vundle.vim.git" "${VIM_DIR}/plugins/Vundle.vim" \
-    && printf "\n" | vim +PluginInstall +qall
+  rm -rf "${VIM_DIR}/plugins/Vundle.vim" | dotfiles_log
 
-  print_result $? 'Install Vim plugins'
+  git clone "https://github.com/gmarik/Vundle.vim.git" "${VIM_DIR}/plugins/Vundle.vim" | dotfiles_log
+  
+  printf "\n" | vim +PluginInstall +qall
+
+  print_result "$PIPESTATUS[0]" 'Install Vim plugins'
 }
 
 vim_update_plugins() {
@@ -32,15 +34,18 @@ vim_update_plugins() {
   local pwd="$(pwd)"
 
   if is_vim_installed; then
-    cd "${VIM_DIR}" && git -q fetch --tags
+    cd -v "${VIM_DIR}"
+    git fetch --tags | dotfiles_log
 
     local tag="$(git describe --tags $(git rev-list --tags --max-count=1))"
 
     if [[ "$tag" != "" ]]; then
-      git -q checkout "${tag}" \
-        && printf "\n" | vim +PluginInstall +qall 2> /dev/null
+      git checkout "${tag}" | dotfiles_log
 
-      print_result $? 'Install vim plugins'
+      [[ "$PIPESTATUS[0]" -eq 0 ]] \
+        && printf "\n" | vim +PluginInstall +qall
+
+      print_result "$PIPESTATUS[0]" 'Install vim plugins'
     fi
   fi
 }

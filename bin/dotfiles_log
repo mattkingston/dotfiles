@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+declare message=""
+
+if [[ $# -ge 1 ]]; then
+  message="$1"
+else
+  read message
+fi
+
+if [[ ! -e ~/.dotfiles.log ]]; then
+  touch ~/.dotfiles.log
+fi
+
+echo "${message}" >> ~/.dotfiles.log
+
+unset message

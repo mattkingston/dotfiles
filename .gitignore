@@ -7,3 +7,7 @@ vim/swaps/*
 vim/backups/*
 
 bin/webs
+
+.*_installed
+
+*.log

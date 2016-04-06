@@ -36,6 +36,8 @@ unset _PATH SEGMENT
 
 export PATH;
 
+export APT_RC=/etc/apt/apt.conf.d/01dotfiles
+
 export INPUT_RC=~/.inputrc
 
 export GIT_CONF_LOCAL=~/.gitconfig.local
@@ -44,7 +46,7 @@ export CURL_RC=~/.curlrc
 
 export DIR_COLORS=~/.dircolors
 
-if [[ -f ~/.dotfiles/.tmux_installed ]]; then
+if [[ -e ~/.dotfiles/.tmux_installed ]]; then
   export TMUX_CONF=~/.tmux.conf
 fi
 
@@ -53,9 +55,10 @@ export NVM_DIR="$DOTFILES_DIR"/nvm
 export NPM_RC=~/.npmrc
 
 export RVM_DIR="$DOTFILES_DIR"/rvm
+export rvm_path="$DOTFILES_DIR"/rvm
 export GEM_RC=~/.gemrc
 
-if [[ -f ~/.dotfiles/.vim_installed ]]; then
+if [[ -e ~/.dotfiles/.vim_installed ]]; then
   export VIM_DIR="$DOTFILES_DIR"/vim
 
   export MYVIMRC=~/.vimrc

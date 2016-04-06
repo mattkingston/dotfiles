@@ -12,7 +12,7 @@ is_rvm_installed() {
 
 rvm_update() {
   if is_rvm_installed; then
-    execute "rvm get stable" "Update RVM"
+    execute "rvm get stable | dotfiles_log" "Update RVM"
   else
     print_error "RVM not installed"
   fi
@@ -39,7 +39,7 @@ rvm_default() {
   local default="$1"
 
   if is_rvm_installed; then
-    execute "rvm use --default ${default}" "RVM set default: ${default}"
+    execute "rvm use --default ${default} | dotfiles_log" "RVM set default: ${default}"
   else
     print_error "RVM not installed"
   fi

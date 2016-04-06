@@ -20,14 +20,24 @@ install_nvm() {
   fi
 
   if [ ! -d "${NVM_DIR}" ]; then
-    git clone https://github.com/creationix/nvm.git "$NVM_DIR" \
-      && cd "$NVM_DIR" \
-      && git checkout `git describe --abbrev=0 --tags`
+    git clone https://github.com/creationix/nvm.git "$NVM_DIR" | dotfiles_log
 
-    . ~/.dotfiles/bash/autocomplete.sh
+    if [[ "$PIPESTATUS[0]" -eq 0 ]]; then
+      cd "$NVM_DIR"
 
-    print_result $? 'NVM'
+      git checkout `git describe --abbrev=0 --tags` | dotfiles_log
+
+      if [[ "$PIPESTATUS[0]" -eq 0 ]]; then
+        print_success 'NVM'
+      else
+        print_error 'NVM'
+      fi
+    else
+      print_error 'NVM'
+    fi
   fi
+
+  . ~/.dotfiles/bash/autocomplete.sh
 
   nvm_update \
     && source "${NVM_DIR}/nvm.sh"
@@ -35,7 +45,7 @@ install_nvm() {
   # Install node versions
   for i in "${node_versions[@]}"; do
     if [[ "$(nvm ls "$i" | grep -q "N/A")" -ne 1 ]]; then
-      execute "nvm install $i" "NVM install: $i"
+      execute "nvm install $i | dotfiles_log" "NVM install: $i"
     fi
   done
 

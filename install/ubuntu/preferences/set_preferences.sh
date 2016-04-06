@@ -5,6 +5,11 @@ set_preferences() {
 
   cd "$(dirname "${0}")"
 
+  . ~/.dotfiles/bin/dotfiles
+
+  # Simple configuration storage system
+  apt_install 'GSettings' 'libglib2.0-bin' # Allows using gsettings for all preferences
+
   ./set_privacy_preferences.sh
   ./set_terminal_preferences.sh
   ./set_ui_and_ux_preferences.sh
