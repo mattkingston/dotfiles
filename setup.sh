@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-declare GIT_REMOTE="http://github.com/mattkingston/dotfiles-v2.git"
-declare TARBALL_URL="http://github.com/mattkingston/dotfiles-v2/tarball/master"
+declare GIT_REMOTE="http://github.com/mattkingston/dotfiles.git"
+declare TARBALL_URL="http://github.com/mattkingston/dotfiles/tarball/master"
 
 # Main
 
@@ -176,25 +176,30 @@ setup() {
     fi
   fi
 
-  print_subtitle 'NVM'
+  if is_callable 'git'; then
+    print_subtitle 'NVM'
 
-  ask_for_confirmation 'Do you want to install NVM?'
+    ask_for_confirmation 'Do you want to install NVM?'
 
-  if answer_is_yes; then
-    ./install/install_nvm.sh
+    if answer_is_yes; then
+      ./install/install_nvm.sh
+    fi
+
+    . ~/.dotfiles/bash/autocomplete.sh
+
+    if command -v "npm" || type -t "npm"; then
+      print_subtitle 'Global NPM Packages'
+
+      ask_for_confirmation 'Do you want to install global npm packages?'
+
+      if answer_is_yes; then
+        ./install/install_npm_packages.sh
+      fi
+
+      . ~/.dotfiles/bash/autocomplete.sh
+    fi
   fi
 
-  . ~/.dotfiles/bash/autocomplete.sh
-
-  print_subtitle 'Global NPM Packages'
-
-  ask_for_confirmation 'Do you want to install global npm packages?'
-
-  if answer_is_yes; then
-    ./install/install_npm_packages.sh
-  fi
-
-  . ~/.dotfiles/bash/autocomplete.sh
 
   print_subtitle 'RVM'
 
@@ -202,13 +207,12 @@ setup() {
 
   if answer_is_yes; then
     ./install/install_rvm.sh
+    . ~/.dotfiles/bash/autocomplete.sh
   fi
-
-  . ~/.dotfiles/bash/autocomplete.sh
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  if cmd_exists 'vim'; then
+  if cmd_exists 'vim' && [[ -f ~/.dotfiles/.vim_installed ]]; then
     print_subtitle 'Install/Update Vim plugins'
 
     ask_for_confirmation 'Do you want to install/update the Vim plugins?'

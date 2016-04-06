@@ -129,29 +129,38 @@ ubuntu_install_applications() {
   update_ubuntu
 
   if [[ "${install_bash4x}" == true ]]; then
-    wget --no-check-certificate -qO ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" && ! grep -q 'Not found' ~/.bash-4.3.tar.gz \
-        || ( print_error "Downloading bash 4.3 tarball failed" && exit 1 )
+    wget --no-check-certificate -qO ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
 
-    tar -xf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &> /dev/null \
-        || ( print_error "Extracting tarball failed" && exit 1 )
+    if [[ "$?" -ne 1 ]]; then
+      if grep -q 'Not found' ~/.bash-4.3.tar.gz; then
+        print_error "Downloading bash 4.3 tarball failed"
+      fi
 
-    cd ~/.bash-4.3
+      tar -xf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &> /dev/null
 
-    ./configure &> /dev/null
+      if [[ "$?" -eq 1 ]]; then
+        print_error "Extracting tarball failed"
+      else
+        cd ~/.bash-4.3
 
-    make &> /dev/null
-    sudo make install &> /dev/null
+        ./configure &> /dev/null
 
-    print_success "Bash 4.3"
+        make &> /dev/null
+        sudo make install &> /dev/null
 
-    chsh -s "/bin/bash" &> /dev/null
+        print_success "Bash 4.3"
 
-    print_result $? 'Set version of Bash to use 4.3'
+        chsh -s "/bin/bash" &> /dev/null
 
-    rm ~/.bash-4.3.tar.gz &> /dev/null
-    rm -R ~/.bash-4.3 &> /dev/null
+        print_result $? 'Set version of Bash to use 4.3'
 
-    cd "$(dirname "${0}")"
+        rm ~/.bash-4.3.tar.gz &> /dev/null
+        rm -R ~/.bash-4.3 &> /dev/null
+
+        cd "$(dirname "${0}")"
+      fi
+    fi
+
   fi
 
   if [[ "${install_git}" == true ]]; then
@@ -172,6 +181,7 @@ ubuntu_install_applications() {
 
   if [[ "${install_vim}" == true ]]; then
     apt_install 'GNOME Vim' 'vim-gnome'
+    touch ~/.dotfiles/.vim_installed
   fi
 
   if [[ "${install_xclip}" == true ]]; then

@@ -29,6 +29,14 @@ copy_dotfiles() {
   fi
 
   for i in "${dotfiles[@]}"; do
+    if [[ ("${1}" == "vimrc" || "${1}" == "gvimrc") && ! -f ~/.dotfiles/.vim_installed ]]; then
+      continue
+    fi
+
+    if [[ "${1}" == "tmux.conf" && ! -f ~/.dotfiles/.tmux_installed ]]; then
+      continue
+    fi
+
     if [[ -e ~/."${i}" && -n "${backup_dir}" ]]; then
       if [[ ! -d "${backup_dir}" ]]; then
         mkdir "${backup_dir}"

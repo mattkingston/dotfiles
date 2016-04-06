@@ -37,7 +37,13 @@ install_rvm() {
     execute "rvm --quiet-curl --install ${i}" "RVM install: ${i}"
   done
 
-  rvm_default "${use_default_version}"
+  for i in "${ruby_versions[@]}"; do
+    ask_for_confirmation "Do you want to use ruby ${i} as the default?"
+
+    if answer_is_yes; then
+      rvm_default "${i}"
+    fi
+  done
 
   execute "rvm cleanup all" "RVM (cleanup)"
 
