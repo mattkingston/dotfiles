@@ -51,7 +51,14 @@ install_nvm() {
     fi
   done
 
-  nvm_default "${use_default_version}"
+  for i in "${node_versions[@]}"; do
+    ask_for_confirmation "Do you want to use node ${i} as the default?"
+
+    if answer_is_yes; then
+      nvm_default "${i}"
+      break
+    fi
+  done
 
   cd "${pwd}"
 }

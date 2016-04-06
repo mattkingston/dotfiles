@@ -18,10 +18,12 @@ install_npm_packages() {
   fi
 
   npm_config_registry
-  npm_update
+#  npm_update
 
   for i in "${packages[@]}"; do
-    execute "npm install --global ${i}" "${i}"
+    echo "NPM: Installing $i. Please wait" | dotfiles_log
+    npm install --global "${i}" &>> ~/.dotfiles.log
+    print_result $? "${i}"
   done
 
   cd "${pwd}"

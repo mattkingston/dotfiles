@@ -10,7 +10,7 @@ setup() {
   local backup_suffix="$(date +%Y-%m-%d-%H-%M-%S)"
 
   echo "" > ~/.dotfiles.log # Truncate log before each attempt
-  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $backup_suffix ----" | tee ~/.dotfiles.log &> /dev/null
+  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date +%Y-%m-%d %H:%M:%S) ----" | tee ~/.dotfiles.log &> /dev/null
 
   if [[ "$BASH_SOURCE" == "" ]]; then
     # Backup first
@@ -296,25 +296,6 @@ setup() {
 
   if answer_is_yes; then
     ./install/setup_github_ssh_keys.sh
-  fi
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  ssh -T git@github.com &> /dev/null
-
-  if [[ $? -ne 1 ]]; then
-    if [[ "$BASH_SOURCE" == "" ]] && command -v 'git' && ! is_git_repository; then
-      if [[ "$(git config --get remote.origin.url)" != "$GIT_REMOTE" ]]; then
-        print_subtitle "Dotfiles"
-
-        print_info 'Initialize Git repository'
-
-        git init &>> ~/.dotfiles.log
-        git remote add origin "$GIT_REMOTE" &>> ~/.dotfiles.log
-
-        print_result $? 'Initialize the Git repository'
-      fi
-    fi
   fi
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
