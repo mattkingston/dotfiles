@@ -16,35 +16,36 @@ apt_key_accept() {
   local keyserver="$1"
   local keys="$2"
 
-  sudo -E apt-key adv --keyserver "${keyserver}" --recv-keys "${keys}" | dotfiles_log
-  print_result "$PIPESTATUS[0]" "Accept keys ${2}"
+  sudo -E apt-key adv --keyserver "${keyserver}" --recv-keys "${keys}" &>> ~/.dotfiles.log
+  print_result $? "Accept keys ${2}"
 }
 
 apt_ppa_add() {
-  sudo -E add-apt-repository -y ppa:"${1}" | dotfiles_log
-  print_result "$PIPESTATUS[0]" "Add ppa ${1}"
+  sudo -E add-apt-repository -y ppa:"${1}" &>> ~/.dotfiles.log
+  print_result $? "Add ppa ${1}"
 }
 
 apt_source_add() {
   printf 'deb %s' "${1}" | sudo tee -a '/etc/apt/sources.list.d/${2}' &> /dev/null
-  print_result "$PIPESTATUS[0]" "${3:-$2}"
+  print_result $? "${3:-$2}"
 }
 
 apt_install() {
   local package="${2}"
   local package_name="${1}"
 
-  if ! command -v "${package}" && ! type -t "${package}"; then
-    sudo -E apt-get install --allow-unauthenticated -y "${package}" | dotfiles_log
-    print_result "$PIPESTATUS[0]" "${package_name}"
-  else
-    print_success "${package_name}"
-  fi
+  sudo -E apt-get install --allow-unauthenticated -y "${package}" &>> ~/.dotfiles.log
+  print_result $? "${package_name}"
 }
 
 update_ubuntu() {
-  execute 'sudo -E apt-get update -y | dotfiles_log' 'Update'
-  execute 'sudo -E apt-get upgrade -y | dotfiles_log' 'Upgrade'
+  sudo -E apt-get update -y &>> ~/.dotfiles.log
+
+  print_result $? "Update"
+
+  sudo -E apt-get upgrade -y &>> ~/.dotfiles.log
+
+  print_result $? "Upgrade"
 }
 
 apt_set_aptrc() {

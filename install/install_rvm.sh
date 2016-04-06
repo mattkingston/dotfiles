@@ -22,10 +22,10 @@ install_rvm() {
   if [ ! -d "${RVM_DIR}" ]; then
     # Import RVM keys first
     if cmd_exists 'gpg'; then
-      curl -L https://rvm.io/mpapis.asc | gpg --import - | dotfiles_log
+      curl -L https://rvm.io/mpapis.asc | gpg --import - &>> ~/.dotfiles.log
     fi
 
-    curl -L https://get.rvm.io | bash -s stable --ignore-dotfiles --path "$RVM_DIR" | dotfiles_log
+    curl -L https://get.rvm.io | bash -s stable --ignore-dotfiles --path "$RVM_DIR" &>> ~/.dotfiles.log
 
     print_result $? 'RVM'
   fi
@@ -34,7 +34,8 @@ install_rvm() {
 
   # Install ruby versions
   for i in "${ruby_versions[@]}"; do
-    execute "rvm --quiet-curl --install ${i} | dotfiles_log" "RVM install: ${i}"
+    rvm --install ${i} &>> ~/.dotfiles.log
+    print_result $? "RVM install: ${i}"
   done
 
   for i in "${ruby_versions[@]}"; do
@@ -46,10 +47,12 @@ install_rvm() {
     fi
   done
 
-  execute "rvm cleanup all | dotfiles_log" "RVM (cleanup)"
+  rvm cleanup all &>> ~/.dotfiles.log
+  print_result $? "RVM (cleanup)"
 
   if [[ "$OS" == 'osx' ]]; then
-    execute "rvm osx-ssl-certs update all | dotfiles_log" "Update OS X SSL certs"
+    rvm osx-ssl-certs update all &>> ~/.dotfiles.log
+    print_result $? "Update OS X SSL certs"
   fi
 
   cd "${pwd}"

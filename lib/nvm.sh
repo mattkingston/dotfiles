@@ -9,8 +9,9 @@ is_nvm_installed() {
 nvm_update() {
   if is_nvm_installed; then
     # Ensure the latest version of nvm is used
-    cd "$NVM_DIR" \
-      && git checkout `git describe --abbrev=0 --tags` | dotfiles_log
+    cd "$NVM_DIR"
+
+    git checkout `git describe --abbrev=0 --tags` &>> ~/.dotfiles.log
 
     print_result $? 'NVM update'
   else
@@ -41,7 +42,7 @@ nvm_default() {
   local version="$1"
 
   if is_nvm_installed; then
-    nvm alias default "$version" | dotfiles_log
+    nvm alias default "$version" &>> ~/.dotfiles.log
 
     print_result $? "NVM set default: $version"
   else

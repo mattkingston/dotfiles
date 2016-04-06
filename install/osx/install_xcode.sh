@@ -9,7 +9,7 @@ osx_install_xcode() {
 
   if ! xcode-select -p &> /dev/null; then
     # Prompt user to install the XCode Command Line Tools
-    xcode-select --install | dotfiles_log
+    xcode-select --install &>> ~/.dotfiles.log
 
     # Wait until the XCode Command Line Tools are installed
     while ! xcode-select -p &> /dev/null; do

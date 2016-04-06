@@ -354,8 +354,11 @@ osx_install_applications() {
     fi
   fi
 
-  execute 'brew cleanup | dotfiles_log' 'brew (cleanup)'
-  execute 'brew cask cleanup | dotfiles_log' 'brew cask (cleanup)'
+  brew cleanup &>> ~/.dotfiles.log
+  print_result $? 'brew (cleanup)'
+
+  brew cask cleanup &>> ~/.dotfiles.log
+  print_result $? 'brew cask (cleanup)'
 
   cd "${pwd}"
 }

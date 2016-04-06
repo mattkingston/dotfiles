@@ -2,17 +2,17 @@
 
 npm_update() {
   if command -v 'npm' > /dev/null; then
-    npm install -g npm | dotfiles_log
+    npm install -g npm &>> ~/.dotfiles.log
     print_result $? 'NPM update'
 
-    npm update -g | dotfiles_log
+    npm update -g &>> ~/.dotfiles.log
     print_result $? 'NPM upgrade all'
   fi
 }
 
 npm_config_registry() {
   if command -v 'npm' > /dev/null; then
-    npm config set registry "http://registry.npmjs.org/" | dotfiles_log
+    npm config set registry "http://registry.npmjs.org/" &>> ~/.dotfiles.log
     print_result $? 'NPM Configure registry'
   fi
 }

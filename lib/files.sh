@@ -36,7 +36,7 @@ make_dir() {
         print_success "${1}"
       fi
     else
-      mkdir -p "${1}" | dotfiles_log
+      mkdir -p "${1}" &>> ~/.dotfiles.log
       print_result $? "${1}"
     fi
   fi
@@ -64,7 +64,7 @@ insert_content_to_file_at_line() {
   local content="${2}"
   local line="${3}"
 
-  sed -i.bak "${line}i\n${content}" "${file}" | dotfiles_log
+  sed -i.bak "${line}i\n${content}" "${file}" &>> ~/.dotfiles.log
 
   print_result $? "${3:-Append: ${file}:${line}}"
 }
@@ -73,8 +73,8 @@ remove_content_from_file() {
   local file="${1}"
   local content="${2}"
 
-  sed -i.bak "s|${content}||" "${file}" | dotfiles_log &&
-    rm -v "${file}.bak" | dotfiles_log
+  sed -i.bak "s|${content}||" "${file}" &>> ~/.dotfiles.log
+    rm -v "${file}.bak" &>> ~/.dotfiles.log
 
   print_result $? "Trimmed: ${file}"
 }
@@ -87,13 +87,13 @@ remove_line_from_file() {
   if [[ "$2" =~ ^-?[0-9]+$ ]]; then
     line="$2"
 
-    sed -i.bak "${line}d" "${file}" | dotfiles_log &&
-      rm -v "${file}.bak" | dotfiles_log
+    sed -i.bak "${line}d" "${file}" &>> ~/.dotfiles.log
+      rm -v "${file}.bak" &>> ~/.dotfiles.log
   else
     content="$2"
 
-    sed -i.bak "/${content}/d" "${file}" | dotfiles_log &&
-      rm -v "${file}.bak" | dotfiles_log
+    sed -i.bak "/${content}/d" "${file}" &>> ~/.dotfiles.log
+      rm -v "${file}.bak" &>> ~/.dotfiles.log
   fi
 
   print_result $? "Trimmed: ${file}"
@@ -149,10 +149,10 @@ untar() {
   local out_dir="${2}"
 
   if [[ ! -d "${out_dir}" ]]; then
-    mkdir "${out_dir}" | dotfiles_log
+    mkdir "${out_dir}" &>> ~/.dotfiles.log
   fi
 
-  tar -zxvf "${tar_file}" --strip-components 1 -C "${out_dir}" | dotfiles_log \
+  tar -zxvf "${tar_file}" --strip-components 1 -C "${out_dir}" &>> ~/.dotfiles.log \
     || return 1
 }
 
@@ -196,7 +196,7 @@ content_block_stream_write() {
     print_result $? "Created: '${name}' block : ${out_file}"
   else
     echo "$(cat "${stream}")" >> "${out_file}" \
-      && rm -v "${stream}" | dotfiles_log
+      && rm -v "${stream}" &>> ~/.dotfiles.log
 
     print_result $? "Append: '${name}' block : ${out_file}"
   fi
@@ -208,7 +208,7 @@ content_block_remove() {
   local start_line="$(grep -n "# Start ${name}" "${file}" | cut -d : -f 1)"
   local end_line="$(grep -n "# End ${name}" "${file}" | cut -d : -f 1)"
 
-  sed -i '' "${start_line},${end_line}d" "${file}" | dotfiles_log
+  sed -i '' "${start_line},${end_line}d" "${file}" &>> ~/.dotfiles.log
 
   print_result $? "Removed: '${name}' block"
 }

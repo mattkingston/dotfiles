@@ -27,7 +27,7 @@ is_interactive_session() {
 
 cmd_exists() {
   command -v "${1}" > /dev/null
-  return "$?"
+  return $?
 }
 
 fn_exists() {
@@ -47,7 +47,7 @@ is_callable() {
 execute() {
   eval "${1}"
 
-  if [[ "$PIPESTATUS[0]" -eq 0 ]]; then
+  if [[ $? -eq 0 ]]; then
     print_success "${2}"
     return 0
   fi

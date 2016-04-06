@@ -196,15 +196,21 @@ save_proxy_settings_to_apt() {
 
 save_proxy_settings_to_npm() {
   if command -v 'npm' > /dev/null; then
-    execute "npm config --global set proxy ${http_proxy} | dotfiles_log" "NPM HTTP Proxy"
-    execute "npm config --global set https-proxy ${https_proxy} | dotfiles_log" "NPM HTTPS Proxy"
+    npm config --global set proxy "${http_proxy}" &>> ~/.dotfiles.log
+    print_result $? "NPM HTTP Proxy"
+
+    npm config --global set https-proxy "${https_proxy}" &>> ~/.dotfiles.log
+    print_result $? "NPM HTTPS Proxy"
   fi
 }
 
 save_proxy_settings_to_git() {
   if command -v 'git' > /dev/null; then
-    execute "git config --global http.proxy ${http_proxy} | dotfiles_log" "Git HTTP Proxy"
-    execute "git config --global https.proxy ${https_proxy} | dotfiles_log" "Git HTTPS Proxy"
+    git config --global http.proxy "${http_proxy}" &>> ~/.dotfiles.log
+    print_result $? "Git HTTP Proxy"
+
+    git config --global https.proxy "${https_proxy}" &>> ~/.dotfiles.log
+    print_result $? "Git HTTPS Proxy"
   fi
 }
 
@@ -238,16 +244,16 @@ save_proxy_settings_to_bash() {
 
   local proxy_stream="$(content_block_stream_new Proxy)"
 
-  stream_add "${proxy_stream}" "export proxy_user=\"'${proxy_user}'\""
-  stream_add "${proxy_stream}" "export proxy_pass=\"'${proxy_pass}'\""
+  stream_add "${proxy_stream}" "export proxy_user=\"${proxy_user}\""
+  stream_add "${proxy_stream}" "export proxy_pass=\"${proxy_pass}\""
 
-  stream_add "${proxy_stream}" "export http_proxy=\"'${http_proxy}'\""
-  stream_add "${proxy_stream}" "export https_proxy=\"'${https_proxy}'\""
-  stream_add "${proxy_stream}" "export all_proxy=\"'${all_proxy}'\""
+  stream_add "${proxy_stream}" "export http_proxy=\"${http_proxy}\""
+  stream_add "${proxy_stream}" "export https_proxy=\"${https_proxy}\""
+  stream_add "${proxy_stream}" "export all_proxy=\"${all_proxy}\""
 
-  stream_add "${proxy_stream}" "export saved_http_proxy=\"'${http_proxy}'\""
-  stream_add "${proxy_stream}" "export saved_https_proxy=\"'${https_proxy}'\""
-  stream_add "${proxy_stream}" "export saved_all_proxy=\"'${all_proxy}'\""
+  stream_add "${proxy_stream}" "export saved_http_proxy=\"${http_proxy}\""
+  stream_add "${proxy_stream}" "export saved_https_proxy=\"${https_proxy}\""
+  stream_add "${proxy_stream}" "export saved_all_proxy=\"${all_proxy}\""
 
   content_block_stream_write "${proxy_stream}" "${BASH_RC_LOCAL}"
 }

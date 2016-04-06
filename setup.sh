@@ -22,7 +22,7 @@ setup() {
     if command -v 'curl' > /dev/null; then
       curl -Lko ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
 
-      if [[ "$?" -ne 1 ]]; then
+      if [[ $? -ne 1 ]]; then
         if grep 'Not found' ~/.dotfiles.tar.gz | tee ~/.dotfiles.log &> /dev/null; then
           printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
           exit 1
@@ -32,7 +32,7 @@ setup() {
     elif command -v 'wget' > /dev/null; then
       wget --no-check-certificate -O ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
 
-      if [[ "$?" -ne 1 ]]; then
+      if [[ $? -ne 1 ]]; then
         if grep -q 'Not found' ~/.dotfiles.tar.gz; then
           printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
           exit 1
@@ -55,7 +55,7 @@ setup() {
 
       tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles | tee ~/.dotfiles.log &> /dev/null
 
-      if [[ "$?" -eq 1 ]]; then
+      if [[ $? -eq 1 ]]; then
         printf "\e[38;5;124m%s\n\e[0m" "Extracting tarball failed"
         exit 1
       fi
@@ -172,6 +172,19 @@ setup() {
     ./install/install_applications.sh
   fi
 
+  cd ~/.dotfiles
+
+  print_subtitle 'Copy app dotfiles'
+  ask_for_confirmation 'Do you want to copy app dotfiles?'
+
+  if answer_is_yes; then
+    if [[ "$BASH_SOURCE" == "" ]]; then
+      ./install/copy_applications_dotfiles.sh "$backup_suffix"
+    else
+      ./install/copy_applications_dotfiles.sh
+    fi
+  fi
+
   if is_callable 'git'; then
 
     local git_username=""
@@ -208,14 +221,14 @@ setup() {
       done
     fi
 
-    git config --file "$GIT_CONF_LOCAL" http.sslverify false | dotfiles_log
+    git config --file "$GIT_CONF_LOCAL" http.sslverify false &>> ~/.dotfiles.log
 
     if [[ "$git_username" != "" ]]; then
-      git config --file "$GIT_CONF_LOCAL" user.name "$git_username" | dotfiles_log
+      git config --file "$GIT_CONF_LOCAL" user.name "$git_username" &>> ~/.dotfiles.log
     fi
 
     if [[ "$git_email" != "" ]]; then
-      git config --file "$GIT_CONF_LOCAL" user.email "$git_email" | dotfiles_log
+      git config --file "$GIT_CONF_LOCAL" user.email "$git_email" &>> ~/.dotfiles.log
     fi
   fi
 
@@ -230,7 +243,7 @@ setup() {
 
     . ~/.dotfiles/bash/autocomplete.sh
 
-    if command -v "npm" || type -t "npm"; then
+    if command -v "npm" > /dev/null || type -t "npm" > /dev/null; then
       print_subtitle 'Global NPM Packages'
 
       ask_for_confirmation 'Do you want to install global npm packages?'
@@ -296,10 +309,10 @@ setup() {
 
         print_info 'Initialize Git repository'
 
-        git init | dotfiles_log
-        git remote add origin "$GIT_REMOTE" | dotfiles_log
+        git init &>> ~/.dotfiles.log
+        git remote add origin "$GIT_REMOTE" &>> ~/.dotfiles.log
 
-        print_result "$PIPESTATUS[0]" 'Initialize the Git repository'
+        print_result $? 'Initialize the Git repository'
       fi
     fi
   fi

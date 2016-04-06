@@ -103,48 +103,48 @@ ubuntu_install_applications() {
   # Required for latest git version (default apt version is 1.7 - too low)
   # Required for java core team ppa
 
-  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" | dotfiles_log
+  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" &>> ~/.dotfiles.log
 
   if [[ "${install_git}" == true ]]; then
-    if ! is_callable 'git'; then
-      apt_key_accept "keyserver.ubuntu.com" "A1715D88E1DF1F24" # Git
-      apt_ppa_add 'git-core/ppa' "Git (add PPA)"
+    apt_key_accept "keyserver.ubuntu.com" "A1715D88E1DF1F24" # Git
+    apt_ppa_add 'git-core/ppa' "Git (add PPA)"
+
+    if [[ $? -eq 0 ]]; then
+      update_ubuntu
     fi
   fi
-
-  update_ubuntu
 
   if [[ "${install_bash4x}" == true ]]; then
     # Tools for compiling/building software from source
     apt_install 'Build Essential' 'build-essential' # Installs make, which is used for bash 4.3 setup
 
-    wget --no-check-certificate -O ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" | dotfiles_log
+    wget --no-check-certificate -O ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" &>> ~/.dotfiles.log
 
-    if [[ "$?" -ne 1 ]]; then
+    if [[ $? -ne 1 ]]; then
       if grep -q 'Not found' ~/.bash-4.3.tar.gz; then
         print_error "Downloading bash 4.3 tarball failed"
       fi
 
-      tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 | dotfiles_log
+      tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &>> ~/.dotfiles.log
 
-      if [[ "$?" -eq 1 ]]; then
+      if [[ $? -eq 1 ]]; then
         print_error "Extracting tarball failed"
       else
-        cd -v ~/.bash-4.3 | dotfiles_log
+        cd -v ~/.bash-4.3
 
-        ./configure | dotfiles_log
+        ./configure &>> ~/.dotfiles.log
 
-        make | dotfiles_log
-        sudo make install | dotfiles_log
+        make &>> ~/.dotfiles.log
+        sudo make install &>> ~/.dotfiles.log
 
-        print_result "$PIPESTATUS[0]" "Bash 4.3"
+        print_result $? "Bash 4.3"
 
-        chsh -s "/bin/bash" | dotfiles_log
+        chsh -s "/bin/bash" &>> ~/.dotfiles.log
 
         print_result $? 'Set version of Bash to use 4.3'
 
-        rm ~/.bash-4.3.tar.gz | dotfiles_log
-        rm -R ~/.bash-4.3 | dotfiles_log
+        rm -v ~/.bash-4.3.tar.gz &>> ~/.dotfiles.log
+        rm -vR ~/.bash-4.3 &>> ~/.dotfiles.log
 
         cd "$(dirname "${0}")"
       fi
