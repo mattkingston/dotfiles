@@ -11,29 +11,47 @@ setup() {
 
   if [[ "$BASH_SOURCE" == "" ]]; then
     # Backup first
-    if [[ -d ~/.dotfiles ]]; then
+    if [[ -e ~/.dotfiles ]]; then
       mv ~/.dotfiles ~/.dotfiles.backup-"$backup_suffix"
     fi
 
     # Download tarball
     if command -v 'curl' > /dev/null; then
-      curl -LsSko ~/.dotfiles.tar.gz "${TARBALL_URL}" && ! grep -q 'Not found' ~/.dotfiles.tar.gz \
-        || ( printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed" && exit 1 )
+      curl -LsSko ~/.dotfiles.tar.gz "${TARBALL_URL}"
+
+      if [[ "$?" -ne 1 ]]; then
+        if grep -q 'Not found' ~/.dotfiles.tar.gz; then
+          printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
+          exit 1
+        fi
+      fi
+
     elif command -v 'wget' > /dev/null; then
-      wget --no-check-certificate -qO ~/.dotfiles.tar.gz "${TARBALL_URL}" && ! grep -q 'Not found' ~/.dotfiles.tar.gz \
-        || ( printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed" && exit 1 )
+      wget --no-check-certificate -qO ~/.dotfiles.tar.gz "${TARBALL_URL}"
+
+      if [[ "$?" -ne 1 ]]; then
+        if grep -q 'Not found' ~/.dotfiles.tar.gz; then
+          printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
+          exit 1
+        fi
+      fi
+
     else
-      printf "\e[38;5;124m%s\n\e[0m" "'curl' or 'wget' binaries required" \
-        && exit 1
+      printf "\e[38;5;124m%s\n\e[0m" "'curl' or 'wget' binaries required"
+      exit 1
     fi
 
     # Extract tarball
     if ! command -v 'tar' > /dev/null; then
-      printf "\e[38;5;124m%s\n\e[0m" "'tar' binary required" \
-        && exit 1
+      printf "\e[38;5;124m%s\n\e[0m" "'tar' binary required"
+      exit 1
     else
-      tar -xf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles &> /dev/null \
-        || ( printf "\e[38;5;124m%s\n\e[0m" "Extracting tarball failed" && exit 1 )
+      tar -xf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles &> /dev/null
+
+      if [[ "$?" -eq 1 ]]; then
+        printf "\e[38;5;124m%s\n\e[0m" "Extracting tarball failed"
+        exit 1
+      fi
     fi
   fi
 
