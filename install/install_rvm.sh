@@ -22,10 +22,10 @@ install_rvm() {
   if [ ! -d "${RVM_DIR}" ]; then
     # Import RVM keys first
     if cmd_exists 'gpg'; then
-      curl -qL https://rvm.io/mpapis.asc | gpg --import - &>> ~/.dotfiles.log
+      curl -L https://rvm.io/mpapis.asc | gpg --import - &>> ~/.dotfiles.log
     fi
 
-    curl -qL https://get.rvm.io | bash -s stable --ignore-dotfiles --path "$RVM_DIR" &>> ~/.dotfiles.log
+    curl -L https://get.rvm.io | bash -s stable --ignore-dotfiles --path "$RVM_DIR" &>> ~/.dotfiles.log
 
     print_result $? 'RVM'
   fi

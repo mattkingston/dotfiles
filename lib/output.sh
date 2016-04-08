@@ -75,6 +75,7 @@ print_title() {
   get_color 'purple'
   print_tabs_prefix
   printf '%s\n' "${1}"
+  printf '%s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -84,6 +85,7 @@ print_subtitle() {
   get_color 'white'
   print_tabs_prefix
   printf '%s\n' "${1}"
+  printf '%s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -91,6 +93,7 @@ print_info() {
   get_color 'white'
   print_tabs_prefix
   printf '%s\n' "${1}"
+  printf '%s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -98,6 +101,7 @@ print_subtle() {
   get_color 'grey'
   print_tabs_prefix
   printf '%s\n' "${1}"
+  printf '%s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -106,6 +110,7 @@ print_question() {
   get_color 'blue'
   print_symbol_prefix "?"
   printf '%s ' "${1}"
+  printf 'QUESTION: %s' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -113,6 +118,7 @@ print_success() {
   get_color 'green'
   print_symbol_prefix "✔"
   printf '%s\n' "${1}"
+  printf 'SUCCESS: %s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -120,6 +126,7 @@ print_notice() {
   get_color 'yellow'
   print_symbol_prefix "!"
   printf '%s\n' "${1}"
+  printf 'NOTICE: %s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -127,6 +134,7 @@ print_warning() {
   get_color 'orange'
   print_symbol_prefix "!"
   printf '%s\n' "${1}"
+  printf 'WARNING: %s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 
@@ -134,6 +142,7 @@ print_error() {
   get_color 'red'
   print_symbol_prefix "✖"
   printf '%s\n' "${1}"
+  printf 'ERROR: %s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 

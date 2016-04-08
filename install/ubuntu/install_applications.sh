@@ -88,7 +88,7 @@ ubuntu_install_applications() {
     fi
   fi
 
-  #update_ubuntu
+  update_ubuntu
 
   # GnuPG archive keys of the Debian archive
   # apt_install 'GnuPG archive keys' 'debian-archive-keyring' 

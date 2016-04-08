@@ -184,10 +184,10 @@ ask_proxy_settings() {
 
 save_proxy_settings_to_apt() {
   if is_ubuntu; then
-    echo "Acquire::http::Proxy \"${http_proxy};\"" | sudo tee "${APT_RC}" &> /dev/null
+    echo "Acquire::http::Proxy \"${http_proxy}\";" | sudo tee -a "${APT_RC}" &> /dev/null
     echo "appended http proxy to ${APT_RC}" | dotfiles_log
 
-    echo "Acquire::https::Proxy \"${https_proxy};\"" | sudo tee "${APT_RC}" &> /dev/null
+    echo "Acquire::https::Proxy \"${https_proxy}\";" | sudo tee -a "${APT_RC}" &> /dev/null
     echo "appended https proxy to ${APT_RC}" | dotfiles_log
 
     print_success "Proxy set: ${APT_RC}"

@@ -7,40 +7,43 @@ declare TARBALL_URL="http://github.com/mattkingston/dotfiles/tarball/master"
 
 setup() {
   local pwd="$(pwd)"
-  local backup_suffix="$(date +%Y-%m-%d-%H-%M-%S)"
+  local backup_suffix="$(date "+%Y-%m-%d-%H-%M-%S")"
 
   echo "" > ~/.dotfiles.log # Truncate log before each attempt
-  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date +%Y-%m-%d %H:%M:%S) ----" | tee ~/.dotfiles.log &> /dev/null
+  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date "+%Y-%m-%d %H:%M:%S") ----" | tee ~/.dotfiles.log &> /dev/null
 
   if [[ "$BASH_SOURCE" == "" ]]; then
     # Backup first
     if [[ -e ~/.dotfiles ]]; then
-      mv -v ~/.dotfiles ~/.dotfiles.backup-"$backup_suffix" | tee ~/.dotfiles.log &> /dev/null
+      mv -v ~/.dotfiles ~/.dotfiles.backup-"$backup_suffix" &>> ~/.dotfiles.log
     fi
 
     # Download tarball
     if command -v 'curl' > /dev/null; then
-      curl -Lko ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
+      curl -Lko ~/.dotfiles.tar.gz "${TARBALL_URL}" &>> ~/.dotfiles.log
 
       if [[ $? -ne 1 ]]; then
-        if grep 'Not found' ~/.dotfiles.tar.gz | tee ~/.dotfiles.log &> /dev/null; then
+        if grep -q 'Not found' ~/.dotfiles.tar.gz &>> ~/.dotfiles.log; then
           printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
+          printf "ERROR: %s" "Downloading dotfiles tarball failed" >> ~/.dotfiles.log
           exit 1
         fi
       fi
 
     elif command -v 'wget' > /dev/null; then
-      wget --no-check-certificate -O ~/.dotfiles.tar.gz "${TARBALL_URL}" | tee ~/.dotfiles.log &> /dev/null
+      wget --no-check-certificate -O ~/.dotfiles.tar.gz "${TARBALL_URL}" &>> ~/.dotfiles.log
 
       if [[ $? -ne 1 ]]; then
-        if grep -q 'Not found' ~/.dotfiles.tar.gz; then
+        if grep -q 'Not found' ~/.dotfiles.tar.gz &>> ~/.dotfiles.log; then
           printf "\e[38;5;124m%s\n\e[0m" "Downloading dotfiles tarball failed"
+          printf "ERROR: %s" "Downloading dotfiles tarball failed" >> ~/.dotfiles.log
           exit 1
         fi
       fi
 
     else
       printf "\e[38;5;124m%s\n\e[0m" "'curl' or 'wget' binaries required"
+      printf "ERROR: %s" "'curl' or 'wget' binaries required" >> ~/.dotfiles.log
       exit 1
     fi
 
@@ -50,13 +53,14 @@ setup() {
       exit 1
     else
       if [[ ! -d ~/.dotfiles ]]; then
-        mkdir -v ~/.dotfiles | tee ~/.dotfiles.log &> /dev/null
+        mkdir -v ~/.dotfiles &>> ~/.dotfiles.log
       fi
 
-      tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles | tee ~/.dotfiles.log &> /dev/null
+      tar -xzf ~/.dotfiles.tar.gz --strip-components 1 -C ~/.dotfiles &>> ~/.dotfiles.log
 
       if [[ $? -eq 1 ]]; then
         printf "\e[38;5;124m%s\n\e[0m" "Extracting tarball failed"
+        printf "ERROR: %s" "Extracting tarball failed" >> ~/.dotfiles.log
         exit 1
       fi
     fi
@@ -144,6 +148,7 @@ setup() {
     if answer_is_yes; then
       if ! grep -q "insecure" "$CURL_RC"; then
         echo "insecure" >> "$CURL_RC"
+        echo "\"insecure\" added to $CURL_RC" >> ~/.dotfiles.log
       fi
     fi
   else
@@ -158,6 +163,7 @@ setup() {
     if answer_is_yes; then
       if ! grep -q "insecure" "$CURL_RC"; then
         echo "insecure" >> "$CURL_RC"
+        echo "\"insecure\" added to $CURL_RC" >> ~/.dotfiles.log
       fi
     fi
   fi

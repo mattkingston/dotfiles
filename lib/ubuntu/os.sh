@@ -40,11 +40,11 @@ apt_install() {
 
 update_ubuntu() {
   sudo -E apt-get update -y &>> ~/.dotfiles.log
-
   print_result $? "Update"
+}
 
+upgrade_ubuntu() {
   sudo -E apt-get upgrade -y &>> ~/.dotfiles.log
-
   print_result $? "Upgrade"
 }
 
