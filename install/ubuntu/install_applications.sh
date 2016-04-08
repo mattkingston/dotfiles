@@ -4,6 +4,7 @@ ubuntu_install_applications() {
   local pwd="$(pwd)"
 
   cd "$(dirname "${0}")"
+  local cwd="$(pwd)"
 
   . ~/.dotfiles/bin/dotfiles
 
@@ -151,9 +152,9 @@ ubuntu_install_applications() {
         print_result $? 'Set version of Bash to use 4.3'
 
         rm -v ~/.bash-4.3.tar.gz &>> ~/.dotfiles.log
-        sudo rm -vR ~/.bash-4.3 &>> ~/.dotfiles.log
+        sudo rm -vfR ~/.bash-4.3 &>> ~/.dotfiles.log
 
-        cd "$(dirname "${0}")"
+        cd "$cwd"
       fi
     fi
 
@@ -162,7 +163,7 @@ ubuntu_install_applications() {
   if [[ "${install_git}" == true ]]; then
     apt_install 'Git' 'git'
 
-    if [[ "$http_proxy" -ne "" ]]; then
+    if [[ -n "${http_proxy}" ]]; then
       ask_for_confirmation 'Do you want to use existing Proxy settings for Git (global)?'
 
       if answer_is_yes; then

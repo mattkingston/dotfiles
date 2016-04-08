@@ -32,7 +32,7 @@ install_rvm() {
 
   . ~/.dotfiles/bash/autocomplete.sh
 
-  if [[ "$http_proxy" -ne "" ]]; then
+  if [[ -n "${http_proxy}" ]]; then
     ask_for_confirmation 'Do you want to use existing Proxy settings for Ruby (global)?'
 
     if answer_is_yes; then

@@ -269,7 +269,7 @@ save_proxy_settings() {
       save_proxy_settings_to_apt
     fi
 
-    if command -v 'npm'; then
+    if command -v 'npm' > /dev/null; then
       ask_for_confirmation 'Do you want to use these Proxy settings for NPM (global)?'
 
       if answer_is_yes; then
@@ -277,7 +277,7 @@ save_proxy_settings() {
       fi
     fi
 
-    if command -v 'git'; then
+    if command -v 'git' > /dev/null; then
       ask_for_confirmation 'Do you want to use these Proxy settings for Git (global)?'
 
       if answer_is_yes; then
@@ -285,7 +285,7 @@ save_proxy_settings() {
       fi
     fi
 
-    if command -v 'gem' || type -t 'gem'; then
+    if command -v 'gem' > /dev/null || type -t 'gem' > /dev/null; then
       ask_for_confirmation 'Do you want to use these Proxy settings for Ruby?'
 
       if answer_is_yes; then
