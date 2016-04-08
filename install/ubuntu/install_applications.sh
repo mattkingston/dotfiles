@@ -106,6 +106,9 @@ ubuntu_install_applications() {
   echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" &>> ~/.dotfiles.log
 
   if [[ "${install_git}" == true ]]; then
+    apt_install 'Python Software Properties' 'python-software-properties' # Required in ubuntu 12.04 for add-apt-repository command
+    apt_install 'Common Software Properties' 'software-properties-common' # Required in ubuntu 14.04 for add-apt-repository command
+
     apt_key_accept "keyserver.ubuntu.com" "A1715D88E1DF1F24" # Git
     apt_ppa_add 'git-core/ppa' "Git (add PPA)"
 
@@ -148,7 +151,7 @@ ubuntu_install_applications() {
         print_result $? 'Set version of Bash to use 4.3'
 
         rm -v ~/.bash-4.3.tar.gz &>> ~/.dotfiles.log
-        rm -vR ~/.bash-4.3 &>> ~/.dotfiles.log
+        sudo rm -vR ~/.bash-4.3 &>> ~/.dotfiles.log
 
         cd "$(dirname "${0}")"
       fi
@@ -158,6 +161,14 @@ ubuntu_install_applications() {
 
   if [[ "${install_git}" == true ]]; then
     apt_install 'Git' 'git'
+
+    if [[ "$http_proxy" -ne "" ]]; then
+      ask_for_confirmation 'Do you want to use existing Proxy settings for Git (global)?'
+
+      if answer_is_yes; then
+        save_proxy_settings_to_git
+      fi
+    fi
   fi
 
   if [[ "${install_curl}" == true ]]; then

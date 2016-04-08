@@ -39,6 +39,14 @@ install_nvm() {
 
   . ~/.dotfiles/bash/autocomplete.sh
 
+  if [[ "$http_proxy" -ne "" ]]; then
+    ask_for_confirmation 'Do you want to use existing Proxy settings for NPM (global)?'
+
+    if answer_is_yes; then
+      save_proxy_settings_to_npm
+    fi
+  fi
+
   nvm_update \
     && source "${NVM_DIR}/nvm.sh"
 

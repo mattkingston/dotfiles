@@ -263,28 +263,34 @@ save_proxy_settings() {
 
     save_proxy_settings_to_bash
 
-    ask_for_confirmation 'Do you want to use these Proxy settings for NPM (global)?'
-
-    if answer_is_yes; then
-      save_proxy_settings_to_npm
-    fi
-
-    ask_for_confirmation 'Do you want to use these Proxy settings for Git (global)?'
-
-    if answer_is_yes; then
-      save_proxy_settings_to_git
-    fi
-
     ask_for_confirmation 'Do you want to use these Proxy settings for Aptitude (apt-get)?'
 
     if answer_is_yes; then
       save_proxy_settings_to_apt
     fi
 
-    ask_for_confirmation 'Do you want to use these Proxy settings for Ruby Gems?'
+    if command -v 'npm'; then
+      ask_for_confirmation 'Do you want to use these Proxy settings for NPM (global)?'
 
-    if answer_is_yes; then
-      save_proxy_settings_to_gem
+      if answer_is_yes; then
+        save_proxy_settings_to_npm
+      fi
+    fi
+
+    if command -v 'git'; then
+      ask_for_confirmation 'Do you want to use these Proxy settings for Git (global)?'
+
+      if answer_is_yes; then
+        save_proxy_settings_to_git
+      fi
+    fi
+
+    if command -v 'gem' || type -t 'gem'; then
+      ask_for_confirmation 'Do you want to use these Proxy settings for Ruby?'
+
+      if answer_is_yes; then
+        save_proxy_settings_to_gem
+      fi
     fi
 
     # THESE LINES ARE IMPORTANT

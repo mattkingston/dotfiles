@@ -32,6 +32,14 @@ install_rvm() {
 
   . ~/.dotfiles/bash/autocomplete.sh
 
+  if [[ "$http_proxy" -ne "" ]]; then
+    ask_for_confirmation 'Do you want to use existing Proxy settings for Ruby (global)?'
+
+    if answer_is_yes; then
+      save_proxy_settings_to_gem
+    fi
+  fi
+
   # Install ruby versions
   for i in "${ruby_versions[@]}"; do
     rvm --install ${i} &>> ~/.dotfiles.log

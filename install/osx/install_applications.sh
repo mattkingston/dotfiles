@@ -235,6 +235,14 @@ osx_install_applications() {
 
   if [[ "${install_git}" == true ]]; then
     brew_install 'Git' 'git'
+
+    if [[ "$http_proxy" -ne "" ]]; then
+      ask_for_confirmation 'Do you want to use existing Proxy settings for Git (global)?'
+
+      if answer_is_yes; then
+        save_proxy_settings_to_git
+      fi
+    fi
   fi
 
   if [[ "${install_curl}" == true ]]; then
