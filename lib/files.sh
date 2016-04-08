@@ -54,7 +54,7 @@ append_content_to_file() {
   local content="${2}"
 
   printf "${content}\n" >> "${file}"
-  echo "appended content to $file" | dotfiles_log
+  echo "appended content to $file" >> ~/.dotfiles.log
 
   print_result $? "${3:-Append: ${file}}"
 }

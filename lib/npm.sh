@@ -2,11 +2,11 @@
 
 npm_update() {
   if command -v 'npm' > /dev/null; then
-    echo "Attempting npm update. Please wait" | dotfiles_log
+    echo "Attempting npm update. Please wait" >> ~/.dotfiles.log
     npm install -g npm &>> ~/.dotfiles.log
     print_result $? 'NPM update'
 
-    echo "Attempting npm upgrade npm packages. Please wait" | dotfiles_log
+    echo "Attempting npm upgrade npm packages. Please wait" >> ~/.dotfiles.log
     npm update -g &>> ~/.dotfiles.log
     print_result $? 'NPM upgrade all'
   fi

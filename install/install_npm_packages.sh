@@ -21,7 +21,7 @@ install_npm_packages() {
 #  npm_update
 
   for i in "${packages[@]}"; do
-    echo "NPM: Installing $i. Please wait" | dotfiles_log
+    echo "NPM: Installing $i. Please wait" >> ~/.dotfiles.log
     npm install --global "${i}" &>> ~/.dotfiles.log
     print_result $? "${i}"
   done

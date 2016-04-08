@@ -10,7 +10,7 @@ setup() {
   local backup_suffix="$(date "+%Y-%m-%d-%H-%M-%S")"
 
   echo "" > ~/.dotfiles.log # Truncate log before each attempt
-  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date "+%Y-%m-%d %H:%M:%S") ----" | tee ~/.dotfiles.log &> /dev/null
+  printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date "+%Y-%m-%d %H:%M:%S") ----" | tee -a ~/.dotfiles.log &> /dev/null
 
   if [[ "$BASH_SOURCE" == "" ]]; then
     # Backup first
@@ -82,9 +82,11 @@ setup() {
 
   if [[ ! -e "${BASH_RC_LOCAL}" ]]; then
     touch "${BASH_RC_LOCAL}"
-    echo "created $BASH_RC_LOCAL" | dotfiles_log
     print_result $? "${BASH_RC_LOCAL}"
+    echo "created $BASH_RC_LOCAL" >> ~/.dotfiles.log
   fi
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   ask_for_sudo
 
@@ -106,8 +108,8 @@ setup() {
   for i in "${local[@]}"; do
     if [[ ! -e ~/."${i}" ]]; then
       touch ~/."${i}"
-      echo "created ~/.$i" | dotfiles_log
       print_result $? "~/.${i}"
+      echo "created ~/.$i" >> ~/.dotfiles.log
     fi
   done
 

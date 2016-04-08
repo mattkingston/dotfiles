@@ -110,7 +110,7 @@ print_question() {
   get_color 'blue'
   print_symbol_prefix "?"
   printf '%s ' "${1}"
-  printf 'QUESTION: %s' "${1}" >> ~/.dotfiles.log
+  printf 'QUESTION: %s\n' "${1}" >> ~/.dotfiles.log
   print_reset
 }
 

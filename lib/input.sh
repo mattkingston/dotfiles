@@ -15,21 +15,21 @@ is_no() {
 ask() {
   print_question "$1"
   read
-  printf '%s\n' "$REPLY" >> ~/.dotfiles.log
+  printf 'ANSWER: %s\n' "$REPLY" >> ~/.dotfiles.log
 }
 
 ask_environment() {
   print_question "$1"
   read -e
   printf "\n"
-  printf '%s\n' "$REPLY" >> ~/.dotfiles.log
+  printf 'ANSWER: %s\n' "$REPLY" >> ~/.dotfiles.log
 }
 
 ask_suppress_output() {
   print_question "$1"
   read -s
   printf "\n"
-  printf '%s\n' "<HIDDEN>" >> ~/.dotfiles.log
+  printf 'ANSWER: %s\n' "<HIDDEN>" >> ~/.dotfiles.log
 }
 
 ask_for_confirmation() {

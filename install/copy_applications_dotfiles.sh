@@ -25,17 +25,17 @@ copy_dotfiles() {
     # can we check for gem here too? before we installed though.. maybe not? or capture intent?
 
     if [[ "${i}" == "vimrc" && ! -e ~/.dotfiles/.vim_installed ]]; then
-      echo "Skipped vimrc because VIM was not installed using setup" | dotfiles_log
+      echo "Skipped vimrc because VIM was not installed using setup" >> ~/.dotfiles.log
       continue
     fi
 
     if [[ "${i}" == "gvimrc" && ! -e ~/.dotfiles/.vim_installed ]]; then
-      echo "Skipped gvimrc because VIM was not installed using setup" | dotfiles_log
+      echo "Skipped gvimrc because VIM was not installed using setup" >> ~/.dotfiles.log
       continue
     fi
 
     if [[ "${i}" == "tmux.conf" && ! -e ~/.dotfiles/.tmux_installed ]]; then
-      echo "Skipped tmux.conf because Tmux was not installed using setup" | dotfiles_log
+      echo "Skipped tmux.conf because Tmux was not installed using setup" >> ~/.dotfiles.log
       continue
     fi
 

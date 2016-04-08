@@ -125,12 +125,16 @@ ubuntu_install_applications() {
         print_error "Downloading bash 4.3 tarball failed"
       fi
 
+      if [[ ! -d ~/.bash-4.3 ]]; then
+        mkdir -v ~/.bash-4.3 &>> ~/.dotfiles.log
+      fi
+
       tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &>> ~/.dotfiles.log
 
       if [[ $? -eq 1 ]]; then
         print_error "Extracting tarball failed"
       else
-        cd -v ~/.bash-4.3
+        cd ~/.bash-4.3
 
         ./configure &>> ~/.dotfiles.log
 
@@ -139,7 +143,7 @@ ubuntu_install_applications() {
 
         print_result $? "Bash 4.3"
 
-        chsh -s "/bin/bash" &>> ~/.dotfiles.log
+        chsh -s "/bin/bash"
 
         print_result $? 'Set version of Bash to use 4.3'
 
@@ -163,13 +167,13 @@ ubuntu_install_applications() {
   if [[ "${install_tmux}" == true ]]; then
     apt_install 'tmux' 'tmux'
     touch ~/.dotfiles/.tmux_installed
-    echo "created: ~/.dotfiles/.tmux_installed" | dotfiles_log
+    echo "created: ~/.dotfiles/.tmux_installed" >> ~/.dotfiles.log
   fi
 
   if [[ "${install_vim}" == true ]]; then
     apt_install 'GNOME Vim' 'vim-gnome'
     touch ~/.dotfiles/.vim_installed
-    echo "created: ~/.dotfiles/.vim_installed" | dotfiles_log
+    echo "created: ~/.dotfiles/.vim_installed" >> ~/.dotfiles.log
   fi
 
   if [[ "${install_xclip}" == true ]]; then
