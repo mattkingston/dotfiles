@@ -8,105 +8,55 @@ ubuntu_install_applications() {
 
   . ~/.dotfiles/bin/dotfiles
 
-  local install_bash4x=false
-  local install_git=false
-  local install_tmux=false
-  local install_curl=false
-  local install_zopfli=false
-  local install_vim=false
-  local install_xclip=false
-  local install_zip=false
-  local install_ssh=false
+  local install_all="N"
 
-  local git_username=""
-  local git_email=""
+  ask_install_or_update() {
+    local application="$1"
+    local application_readable="$2"
+    local var="$3"
 
-  ask_for_confirmation "Do you want to install all applications? (y)es for all, (n)o for individual app selection)";
-
-  if answer_is_yes; then
-    install_bash4x=true
-    install_git=true
-    install_tmux=true
-    install_curl=true
-    install_zopfli=true
-    install_vim=true
-    install_xclip=true
-    install_zip=true
-    install_ssh=true
-  else
-    ask_for_confirmation "Do you want to install Bash 4.3?";
-
-    if answer_is_yes; then
-      install_bash4x=true
+    if command -v "$application" > /dev/null; then
+      ask_for_confirmation "Do you want to update $application_readable?";
+    else
+      ask_for_confirmation "Do you want to install $application_readable?";
     fi
 
-    ask_for_confirmation "Do you want to install Git?";
-
     if answer_is_yes; then
-      install_git=true
+      export "$var=Y"
+      echo "declared var $var = ${!var}" >> ~/.dotfiles.log
+
+      return 0
+    else
+      export "$var=N"
+      echo "declared var $var = ${!var}" >> ~/.dotfiles.log
     fi
-
-    ask_for_confirmation "Do you want to install tmux?";
-
-    if answer_is_yes; then
-      install_tmux=true
-    fi
-
-    ask_for_confirmation "Do you want to install cURL?";
-
-    if answer_is_yes; then
-      install_curl=true
-    fi
-
-    ask_for_confirmation "Do you want to install Zopfli compression lib?";
-
-    if answer_is_yes; then
-      install_zopfli=true
-    fi
-
-    ask_for_confirmation "Do you want to install Vim?";
-
-    if answer_is_yes; then
-      install_vim=true
-    fi
-
-    ask_for_confirmation "Do you want to install xclip?";
-
-    if answer_is_yes; then
-      install_xclip=true
-    fi
-
-    ask_for_confirmation "Do you want to install Zip?";
-
-    if answer_is_yes; then
-      install_zip=true
-    fi
-
-    ask_for_confirmation "Do you want to install SSH Pass?";
-
-    if answer_is_yes; then
-      install_ssh=true
-    fi
-  fi
-
-  update_ubuntu
-
-  # GnuPG archive keys of the Debian archive
-  # apt_install 'GnuPG archive keys' 'debian-archive-keyring' 
-
-  # apt_install 'Common Software Properties' 'software-properties-common' # installs python (v3) & common-ca-certificates
-
-  # apt_install 'Python Software Properties' 'python-software-properties'
+  }
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # Allow un-authenticated Apt repositories to install software
-  # Required for latest git version (default apt version is 1.7 - too low)
-  # Required for java core team ppa
+  install_or_update() {
+    local application="$1"
+    local application_readable="$2"
+    local var="$3"
 
-  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" &>> ~/.dotfiles.log
+    echo "Install or update $1, $2, $3" >> ~/.dotfiles.log
+    echo "Should install? $var = ${!var}" >> ~/.dotfiles.log
 
-  if [[ "${install_git}" == true ]]; then
+    if [[ "${install_all}" == "Y" || "${!var}" == "Y" ]]; then
+      if type -t "${var}" > /dev/null; then
+        "${var}"
+      else
+        apt_install "$application_readable" "$application"
+
+        touch ~/.dotfiles/."${application}"_installed
+        echo "created: ~/.dotfiles/.${application}_installed" >> ~/.dotfiles.log
+      fi
+    fi
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  install_git() {
     apt_install 'Python Software Properties' 'python-software-properties' # Required in ubuntu 12.04 for add-apt-repository command
     apt_install 'Common Software Properties' 'software-properties-common' # Required in ubuntu 14.04 for add-apt-repository command
 
@@ -116,13 +66,28 @@ ubuntu_install_applications() {
     if [[ $? -eq 0 ]]; then
       update_ubuntu
     fi
-  fi
 
-  if [[ "${install_bash4x}" == true ]]; then
+    apt_install 'Git' 'git'
+
+    if [[ -n "${http_proxy}" ]]; then
+      ask_for_confirmation 'Do you want to use existing Proxy settings for Git (global)?'
+
+      if answer_is_yes; then
+        save_proxy_settings_to_git
+      fi
+    fi
+
+    touch ~/.dotfiles/.git_installed
+    echo "created: ~/.dotfiles/.git_installed" >> ~/.dotfiles.log
+  }
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  install_bash4x() {
     # Tools for compiling/building software from source
     apt_install 'Build Essential' 'build-essential' # Installs make, which is used for bash 4.3 setup
 
-    wget --no-check-certificate -O ~/.bash-4.3.tar.gz "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" &>> ~/.dotfiles.log
+    download "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz" ~/.bash-4.3.tar.gz
 
     if [[ $? -ne 1 ]]; then
       if grep -q 'Not found' ~/.bash-4.3.tar.gz; then
@@ -158,47 +123,55 @@ ubuntu_install_applications() {
       fi
     fi
 
+    touch ~/.dotfiles/.bash4x_installed
+    echo "created: ~/.dotfiles/.bash4x_installed" >> ~/.dotfiles.log
+  }
+
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  ask_for_confirmation "Do you want to install all applications? (y)es for all, (n)o for individual app selection)";
+
+  if answer_is_yes; then
+    install_all="Y"
+  else
+    ask_install_or_update "bash4x"    "Bash 4.3"                "install_bash4x"
+    ask_install_or_update "git"       "Git"                     "install_git"
+    ask_install_or_update "curl"      "Curl"                    "install_curl"
+    ask_install_or_update "tmux"      "Tmux"                    "install_tmux"
+    ask_install_or_update "zopfli"    "Zopfli compression lib"  "install_zopfli"
+    ask_install_or_update "vim-gnome" "Vim"                     "install_vim"
+    ask_install_or_update "xclip"     "XClip (clipboard)"       "install_xclip"
+    ask_install_or_update "zip"       "Zip"                     "install_zip"
+    ask_install_or_update "sshpass"   "SSH Pass"                "install_sshpass"
   fi
 
-  if [[ "${install_git}" == true ]]; then
-    apt_install 'Git' 'git'
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if [[ -n "${http_proxy}" ]]; then
-      ask_for_confirmation 'Do you want to use existing Proxy settings for Git (global)?'
+  update_ubuntu
 
-      if answer_is_yes; then
-        save_proxy_settings_to_git
-      fi
-    fi
-  fi
+  # GnuPG archive keys of the Debian archive
+  apt_install 'GnuPG archive keys' 'debian-archive-keyring'
 
-  if [[ "${install_curl}" == true ]]; then
-    apt_install 'cURL' 'curl'
-  fi
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  if [[ "${install_tmux}" == true ]]; then
-    apt_install 'tmux' 'tmux'
-    touch ~/.dotfiles/.tmux_installed
-    echo "created: ~/.dotfiles/.tmux_installed" >> ~/.dotfiles.log
-  fi
+  # Allow un-authenticated Apt repositories to install software
+  # Required for latest git version (default apt version is 1.7 - too low)
+  # Required for java core team ppa
 
-  if [[ "${install_vim}" == true ]]; then
-    apt_install 'GNOME Vim' 'vim-gnome'
-    touch ~/.dotfiles/.vim_installed
-    echo "created: ~/.dotfiles/.vim_installed" >> ~/.dotfiles.log
-  fi
+  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" &>> ~/.dotfiles.log
 
-  if [[ "${install_xclip}" == true ]]; then
-    apt_install 'xclip' 'xclip'
-  fi
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  if [[ "${install_zip}" == true ]]; then
-    apt_install 'Zip' 'zip'
-  fi
-
-  if [[ "${install_ssh}" == true ]]; then
-    apt_install 'SSHPass' 'sshpass'
-  fi
+  install_or_update "bash4x"    "Bash 4.3"                "install_bash4x"
+  install_or_update "git"       "Git"                     "install_git"
+  install_or_update "curl"      "Curl"                    "install_curl"
+  install_or_update "tmux"      "Tmux"                    "install_tmux"
+  install_or_update "tmux"      "Zopfli compression lib"  "install_zopfli"
+  install_or_update "vim-gnome" "GNOME Vim"               "install_vim"
+  install_or_update "xclip"     "XClip (clipboard)"       "install_xclip"
+  install_or_update "zip"       "Zip"                     "install_zip"
+  install_or_update "sshpass"   "SSH Pass"                "install_sshpass"
 
   cd "${pwd}"
 }
