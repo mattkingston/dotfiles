@@ -23,12 +23,9 @@ ubuntu_install_applications() {
 
     if answer_is_yes; then
       export "$var=Y"
-      echo "declared var $var = ${!var}" >> ~/.dotfiles.log
-
       return 0
     else
       export "$var=N"
-      echo "declared var $var = ${!var}" >> ~/.dotfiles.log
     fi
   }
 
@@ -38,9 +35,6 @@ ubuntu_install_applications() {
     local application="$1"
     local application_readable="$2"
     local var="$3"
-
-    echo "Install or update $1, $2, $3" >> ~/.dotfiles.log
-    echo "Should install? $var = ${!var}" >> ~/.dotfiles.log
 
     if [[ "${install_all}" == "Y" || "${!var}" == "Y" ]]; then
       if type -t "${var}" > /dev/null; then
