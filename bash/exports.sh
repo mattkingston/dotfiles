@@ -12,7 +12,17 @@ else
   export OS="ubuntu"
 fi
 
-export DOTFILES_DIR=~/.dotfiles
+DOTFILES_DIR=~/.dotfiles
+
+if [[ -L "$DOTFILES_DIR" ]]; then
+  if [ "${OS}" == 'osx' ]; then
+    DOTFILES_DIR="$(readlink $DOTFILES_DIR)";
+  else
+    DOTFILES_DIR="$(readlink -f $DOTFILES_DIR)";
+  fi
+fi
+
+export DOTFILES_DIR
 
 # Dotfiles bin path
 PATH=$DOTFILES_DIR/bin:/usr/local/bin:$PATH
