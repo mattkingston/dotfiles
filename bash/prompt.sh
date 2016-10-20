@@ -54,7 +54,7 @@ set_bash_prompt() {
   fi
 
   PS1+="\[${green}\]\w"             # Working directory
-  PS1+="\[\$(git_repo_info '${white} on ${cyan}')\]"
+  PS1+="\$(git_repo_info '${white} on ${cyan}')"
   PS1+="\[${white}\] ${prompt_symbol} \[${reset}\]"
 
   export PS1
