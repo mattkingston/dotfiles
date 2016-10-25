@@ -8,7 +8,6 @@ install_nvm() {
   . ~/.dotfiles/bin/dotfiles
 
   local -a node_versions=(
-    '0.12.12'
     'node'
   )
 
