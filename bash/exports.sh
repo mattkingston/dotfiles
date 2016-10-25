@@ -25,7 +25,8 @@ fi
 export DOTFILES_DIR
 
 # Dotfiles bin path
-PATH=$DOTFILES_DIR/bin:/usr/local/bin:$PATH
+PATH=$DOTFILES_DIR/bin:/usr/local/bin:\
+/usr/local/sbin:$PATH
 
 _PATH=$PATH:;
 PATH=
@@ -61,15 +62,15 @@ if [[ -e ~/.dotfiles/.tmux_installed ]]; then
 fi
 
 export NVM_NODEJS_ORG_MIRROR=http://nodejs.org/dist
-export NVM_DIR="$DOTFILES_DIR"/nvm
+export NVM_DIR=/usr/local/nvm
 export NPM_RC=~/.npmrc
 
-export RVM_DIR="$DOTFILES_DIR"/rvm
-export rvm_path="$DOTFILES_DIR"/rvm
+export RVM_DIR=/usr/local/rvm
+export rvm_path=/usr/local/rvm
 export GEM_RC=~/.gemrc
 
 if [[ -e ~/.dotfiles/.vim_installed ]]; then
-  export VIM_DIR="$DOTFILES_DIR"/vim
+  export VIM_DIR=/usr/local/etc/vim
 
   export MYVIMRC=~/.vimrc
   export MYVIMRC_LOCAL=~/.vimrc.local
