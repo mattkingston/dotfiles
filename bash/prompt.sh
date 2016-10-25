@@ -29,11 +29,15 @@ set_bash_prompt() {
       yellow="\e[38;5;136m"
   fi
 
+  function print_if_repo() {
+    git rev-parse --is-inside-work-tree &> /dev/null || return
+    printf "${1}"
+  }
+
   function git_repo_info() {
     # check if we're in a git repo. (fast)
     git rev-parse --is-inside-work-tree &> /dev/null || return
 
-    printf "${1:-}"
     printf "$(git symbolic-ref --quiet --short HEAD 2> /dev/null || \
         git describe --all --exact-match HEAD 2> /dev/null || \
         git rev-parse --short HEAD 2> /dev/null || \
@@ -54,7 +58,7 @@ set_bash_prompt() {
   fi
 
   PS1+="\[${green}\]\w"             # Working directory
-  PS1+="\$(git_repo_info '${white} on ${cyan}')"
+  PS1+="\[${white}\]\$(print_if_repo ' on ')\[${cyan}\]\$(git_repo_info)"
   PS1+="\[${white}\] ${prompt_symbol} \[${reset}\]"
 
   export PS1
