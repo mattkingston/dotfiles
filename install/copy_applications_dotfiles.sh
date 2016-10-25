@@ -47,7 +47,7 @@ copy_dotfiles() {
       mv -v ~/."${i}" "${backup_dir}/dotfiles" &>> ~/.dotfiles.log
     fi
 
-    cp -v ./dotfiles/"${i}" ~/."${i}" &>> ~/.dotfiles.log
+    cp -v ../dotfiles/"${i}" ~/."${i}" &>> ~/.dotfiles.log
   done
 
   cd "${pwd}"
