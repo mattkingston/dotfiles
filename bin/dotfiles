@@ -11,25 +11,25 @@ if [[ -n "$1" && -f ~/.dotfiles/lib/"${1}".sh ]]; then
   . ~/.dotfiles/lib/"${1}".sh;
   shift
 else
-  for file in ~/.dotfiles/lib/*; do
+  for file in ~/.dotfiles/lib/*.sh; do
     [[ -f "${file}" ]] \
       && . "$file"
   done
 
   if [[ "$(get_os)" == "osx" ]]; then
-    for osx_file in ~/.dotfiles/lib/osx/*; do
-      [[ -f "${osx_file}" ]] \
+    for osx_file in ~/.dotfiles/lib/osx/*.sh; do
+      [[ -f "${osx_file}" && "${file}" =~ *.sh ]] \
         && . "${osx_file}"
     done
   elif [[ "$(get_os)" == "ubuntu" ]]; then
-    for ubuntu_file in ~/.dotfiles/lib/ubuntu/*; do
-      [[ -f "${ubuntu_file}" ]] \
+    for ubuntu_file in ~/.dotfiles/lib/ubuntu/*.sh; do
+      [[ -f "${ubuntu_file}" && "${file}" =~ *.sh ]] \
         && . "${ubuntu_file}"
     done
   fi
 
-  for file in ~/.dotfiles/lib/*; do
-    [[ -f "${file}" ]] \
+  for file in ~/.dotfiles/lib/*.sh; do
+    [[ -f "${file}" && "${file}" =~ *.sh ]] \
       && . "$file"
   done
 fi
