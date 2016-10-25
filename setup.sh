@@ -10,6 +10,7 @@ setup() {
   local backup_suffix="$(date "+%Y-%m-%d-%H-%M-%S")"
 
   echo "" > ~/.dotfiles.log # Truncate log before each attempt
+  echo "" > ~/.dotfiles.vim-plugins.log
   printf "\n\n\n\n\n       %s\n\n\n\n\n" "---- SETUP BEGAN: $(date "+%Y-%m-%d %H:%M:%S") ----" | tee -a ~/.dotfiles.log &> /dev/null
 
   if [[ "$BASH_SOURCE" == "" ]]; then
