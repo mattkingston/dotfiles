@@ -9,7 +9,7 @@ osx_install_xcode() {
 
   if ! xcode-select -p &> /dev/null; then
     # Prompt user to install the XCode Command Line Tools
-    xcode-select --install &>> ~/.dotfiles.log
+    xcode-select --install > ~/.dotfiles.log
 
     # Wait until the XCode Command Line Tools are installed
     while ! xcode-select -p &> /dev/null; do
@@ -18,17 +18,19 @@ osx_install_xcode() {
 
     print_result $? 'Install XCode Command Line Tools'
 
-    # Point the `xcode-select` developer directory to
-    # the appropriate directory from within `Xcode.app`
-    # https://github.com/alrra/dotfiles/issues/13
+    if [[ -d /Applications/XCode.app/Contents/Developer ]]; then
+        # Point the `xcode-select` developer directory to
+        # the appropriate directory from within `Xcode.app`
+        # https://github.com/alrra/dotfiles/issues/13
 
-    sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
-    print_result $? 'Make "xcode-select" developer directory point to Xcode'
+        sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+        print_result $? 'Make "xcode-select" developer directory point to Xcode'
 
-    # Prompt user to agree to the terms of the Xcode license
-    # https://github.com/alrra/dotfiles/issues/10
-
-    sudo xcodebuild -license
+        # Prompt user to agree to the terms of the Xcode license
+        # https://github.com/alrra/dotfiles/issues/10
+    fi
+    
+    sudo xcodebuild -license accept
     print_result $? 'Agree with the XCode Command Line Tools licence'
   fi
 

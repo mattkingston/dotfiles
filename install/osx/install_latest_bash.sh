@@ -44,7 +44,7 @@ osx_install_latest_bash() {
   # Make OS X use the Bash version installed through Homebrew
   # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/chsh.1.html
 
-  chsh -s "$HOMEBREW_PREFIX"/bin/bash &>> ~/.dotfiles.log
+  chsh -s "$HOMEBREW_PREFIX"/bin/bash 1>> ~/.dotfiles.log
 
   print_result $? 'Set version of Bash to use 4.3'
 

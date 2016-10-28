@@ -16,12 +16,12 @@ apt_key_accept() {
   local keyserver="$1"
   local keys="$2"
 
-  sudo -E apt-key adv --keyserver "${keyserver}" --recv-keys "${keys}" &>> ~/.dotfiles.log
+  sudo -E apt-key adv --keyserver "${keyserver}" --recv-keys "${keys}" 1>> ~/.dotfiles.log
   print_result $? "Accept keys ${2}"
 }
 
 apt_ppa_add() {
-  sudo -E add-apt-repository -y ppa:"${1}" &>> ~/.dotfiles.log
+  sudo -E add-apt-repository -y ppa:"${1}" 1>> ~/.dotfiles.log
   print_result $? "Add ppa ${1}"
 }
 
@@ -34,17 +34,17 @@ apt_install() {
   local package="${2}"
   local package_name="${1}"
 
-  sudo -E apt-get install --allow-unauthenticated -y "${package}" &>> ~/.dotfiles.log
+  sudo -E apt-get install --allow-unauthenticated -y "${package}" 1>> ~/.dotfiles.log
   print_result $? "${package_name}"
 }
 
 update_ubuntu() {
-  sudo -E apt-get update -y &>> ~/.dotfiles.log
+  sudo -E apt-get update -y 1>> ~/.dotfiles.log
   print_result $? "Update"
 }
 
 upgrade_ubuntu() {
-  sudo -E apt-get upgrade -y &>> ~/.dotfiles.log
+  sudo -E apt-get upgrade -y 1>> ~/.dotfiles.log
   print_result $? "Upgrade"
 }
 

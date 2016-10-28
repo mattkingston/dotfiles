@@ -22,7 +22,7 @@ install_npm_packages() {
 
   for i in "${packages[@]}"; do
     echo "NPM: Installing $i. Please wait" >> ~/.dotfiles.log
-    npm install --global "${i}" &>> ~/.dotfiles.log
+    npm install --global "${i}" 1>> ~/.dotfiles.log
     print_result $? "${i}"
   done
 

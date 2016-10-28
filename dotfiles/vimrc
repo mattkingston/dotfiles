@@ -128,7 +128,7 @@ set runtimepath+=$VIM_DIR/plugins/Vundle.vim
 
 " Initialize Vundle and specify the path
 " where the plugins should be installed
-call vundle#begin($VIM_DIR/plugins)
+call vundle#begin("$VIM_DIR/plugins")
 
     " Let Vundle manage Vundle (this is important!)
     Plugin 'gmarik/Vundle.vim'
@@ -176,27 +176,12 @@ let g:NERDTreeWinSize=45
 " | Plugins - seoul256                                                 |
 " ----------------------------------------------------------------------
 
-let g:seoul256_background = 233
+"let g:seoul256_background = 233
 
-colo seoul256
+"colo seoul256
 
-highlight NonText ctermfg=238 guifg=#565656
-highlight SpecialKey ctermfg=238 guifg=#565656
-
-
-" ----------------------------------------------------------------------
-" | Plugins - Emmet                                                    |
-" ----------------------------------------------------------------------
-
-" Redefine trigger key for Emmet
-" http://docs.emmet.io/cheat-sheet/
-
-let g:user_emmet_leader_key='<C-E>'
-
-" Load custom Emmet snippets
-" http://docs.emmet.io/customization/snippets/
-
-let g:user_emmet_settings = webapi#json#decode(join(readfile(expand($VIM_DIR/snippets/emmet.json)), "\n"))
+"highlight NonText ctermfg=238 guifg=#565656
+"highlight SpecialKey ctermfg=238 guifg=#565656
 
 
 " ----------------------------------------------------------------------

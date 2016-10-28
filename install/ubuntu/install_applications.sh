@@ -89,20 +89,20 @@ ubuntu_install_applications() {
       fi
 
       if [[ ! -d ~/.bash-4.3 ]]; then
-        mkdir -v ~/.bash-4.3 &>> ~/.dotfiles.log
+        mkdir -v ~/.bash-4.3 1>> ~/.dotfiles.log
       fi
 
-      tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 &>> ~/.dotfiles.log
+      tar -xzvf ~/.bash-4.3.tar.gz --strip-components 1 -C ~/.bash-4.3 1>> ~/.dotfiles.log
 
       if [[ $? -eq 1 ]]; then
         print_error "Extracting tarball failed"
       else
         cd ~/.bash-4.3
 
-        ./configure &>> ~/.dotfiles.log
+        ./configure 1>> ~/.dotfiles.log
 
-        make &>> ~/.dotfiles.log
-        sudo make install &>> ~/.dotfiles.log
+        make 1>> ~/.dotfiles.log
+        sudo make install 1>> ~/.dotfiles.log
 
         print_result $? "Bash 4.3"
 
@@ -110,8 +110,8 @@ ubuntu_install_applications() {
 
         print_result $? 'Set version of Bash to use 4.3'
 
-        rm -v ~/.bash-4.3.tar.gz &>> ~/.dotfiles.log
-        sudo rm -vfR ~/.bash-4.3 &>> ~/.dotfiles.log
+        rm -v ~/.bash-4.3.tar.gz 1>> ~/.dotfiles.log
+        sudo rm -vfR ~/.bash-4.3 1>> ~/.dotfiles.log
 
         cd "$cwd"
       fi
@@ -153,7 +153,7 @@ ubuntu_install_applications() {
   # Required for latest git version (default apt version is 1.7 - too low)
   # Required for java core team ppa
 
-  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" &>> ~/.dotfiles.log
+  echo 'APT::Get::AllowUnauthenticated 1;' | sudo tee "/etc/apt/apt.conf.d/02allow-unsigned" 1>> ~/.dotfiles.log
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

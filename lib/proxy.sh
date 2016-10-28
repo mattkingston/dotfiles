@@ -196,20 +196,20 @@ save_proxy_settings_to_apt() {
 
 save_proxy_settings_to_npm() {
   if command -v 'npm' > /dev/null; then
-    npm config --global set proxy "${http_proxy}" &>> ~/.dotfiles.log
+    npm config --global set proxy "${http_proxy}" 1>> ~/.dotfiles.log
     print_result $? "NPM HTTP Proxy"
 
-    npm config --global set https-proxy "${https_proxy}" &>> ~/.dotfiles.log
+    npm config --global set https-proxy "${https_proxy}" 1>> ~/.dotfiles.log
     print_result $? "NPM HTTPS Proxy"
   fi
 }
 
 save_proxy_settings_to_git() {
   if command -v 'git' > /dev/null; then
-    git config --global http.proxy "${http_proxy}" &>> ~/.dotfiles.log
+    git config --global http.proxy "${http_proxy}" 1>> ~/.dotfiles.log
     print_result $? "Git HTTP Proxy"
 
-    git config --global https.proxy "${https_proxy}" &>> ~/.dotfiles.log
+    git config --global https.proxy "${https_proxy}" 1>> ~/.dotfiles.log
     print_result $? "Git HTTPS Proxy"
   fi
 }

@@ -41,13 +41,13 @@ copy_dotfiles() {
 
     if [[ -e ~/."${i}" && -n "${backup_dir}" ]]; then
       if [[ ! -d "${backup_dir}" ]]; then
-        mkdir -v "${backup_dir}" &>> ~/.dotfiles.log
+        mkdir -v "${backup_dir}" 1>> ~/.dotfiles.log
       fi
 
-      mv -v ~/."${i}" "${backup_dir}/dotfiles" &>> ~/.dotfiles.log
+      mv -v ~/."${i}" "${backup_dir}/dotfiles" 1>> ~/.dotfiles.log
     fi
 
-    cp -v ../dotfiles/"${i}" ~/."${i}" &>> ~/.dotfiles.log
+    cp -v ../dotfiles/"${i}" ~/."${i}" 1>> ~/.dotfiles.log
   done
 
   cd "${pwd}"

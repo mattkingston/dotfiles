@@ -3,18 +3,18 @@
 npm_update() {
   if command -v 'npm' > /dev/null; then
     echo "Attempting npm update. Please wait" >> ~/.dotfiles.log
-    npm install -g npm &>> ~/.dotfiles.log
+    npm install -g npm 1>> ~/.dotfiles.log
     print_result $? 'NPM update'
 
     echo "Attempting npm upgrade npm packages. Please wait" >> ~/.dotfiles.log
-    npm update -g &>> ~/.dotfiles.log
+    npm update -g 1>> ~/.dotfiles.log
     print_result $? 'NPM upgrade all'
   fi
 }
 
 npm_config_registry() {
   if command -v 'npm' > /dev/null; then
-    npm config set registry "http://registry.npmjs.org/" &>> ~/.dotfiles.log
+    npm config set registry "http://registry.npmjs.org/" 1>> ~/.dotfiles.log
     print_result $? 'NPM Configure registry'
   fi
 }

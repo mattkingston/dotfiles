@@ -31,9 +31,9 @@ download() {
   local out_file="${2}"
 
   if command -v 'curl' > /dev/null; then
-    curl -Lko ${out_file} "${url}" &>> ~/.dotfiles.log
+    curl -Lko ${out_file} "${url}" 1>> ~/.dotfiles.log
   elif command -v 'wget' > /dev/null; then
-    wget --no-check-certificate -O ${out_file} "${url}" &>> ~/.dotfiles.log
+    wget --no-check-certificate -O ${out_file} "${url}" 1>> ~/.dotfiles.log
   else
     return 1
   fi

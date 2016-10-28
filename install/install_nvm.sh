@@ -19,12 +19,12 @@ install_nvm() {
   fi
 
   if [ ! -d "${NVM_DIR}" ]; then
-    git clone https://github.com/creationix/nvm.git "$NVM_DIR" &>> ~/.dotfiles.log
+    git clone https://github.com/creationix/nvm.git "$NVM_DIR" 1>> ~/.dotfiles.log
 
     if [[ $? -eq 0 ]]; then
       cd "$NVM_DIR"
 
-      git checkout `git describe --abbrev=0 --tags` &>> ~/.dotfiles.log
+      git checkout `git describe --abbrev=0 --tags` 1>> ~/.dotfiles.log
 
       if [[ $? -eq 0 ]]; then
         print_success 'NVM'
@@ -52,7 +52,7 @@ install_nvm() {
   # Install node versions
   for i in "${node_versions[@]}"; do
     if [[ "$(nvm ls "$i" | grep -q "N/A")" -ne 1 ]]; then
-      nvm install $i &>> ~/.dotfiles.log
+      nvm install $i 1>> ~/.dotfiles.log
 
       print_result $? "NVM install: $i"
     fi

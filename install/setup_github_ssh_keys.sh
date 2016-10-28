@@ -8,6 +8,10 @@ set_github_ssh_key() {
   local github_ssh_url='https://github.com/settings/ssh'
   local ssh_key_file='id_rsa.pub'
   
+  if [[ ! -d ~/.ssh ]]; then
+    mkdir ~/.ssh
+  fi
+
   cd ~/.ssh
 
   # Setup GitHub SSH Key
@@ -18,7 +22,7 @@ set_github_ssh_key() {
   if [ ! -r "${ssh_key_file}" ]; then
     rm -rf "${ssh_key_file}" &> /dev/null
     ask 'Please provide an email address for ssh key file: ' && printf '\n'
-    ssh-keygen -t rsa -C "$(get_answer)" &> /dev/null
+    ssh-keygen -t rsa -C "$(get_answer)"
   fi
 
   if cmd_exists 'open' && cmd_exists 'pbcopy'; then

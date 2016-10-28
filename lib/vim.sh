@@ -16,11 +16,13 @@ vim_reinstall_plugins() {
     exit 1
   fi
 
-  rm -rf "${VIM_DIR}/plugins/Vundle.vim" &>> ~/.dotfiles.log
+  if [[ -d "${VIM_DIR}/plugins" ]]; then
+    rm -rfv "${VIM_DIR}"/plugins/* 1>> ~/.dotfiles.log
+  fi
 
-  git clone "https://github.com/gmarik/Vundle.vim.git" "${VIM_DIR}/plugins/Vundle.vim" &>> ~/.dotfiles.log
+  git clone "https://github.com/gmarik/Vundle.vim.git" "${VIM_DIR}/plugins/Vundle.vim" 1>> ~/.dotfiles.log
   
-  printf "\n" | vim +PluginInstall +qall &>> ~/.dotfiles.vim-plugins.log
+  vim +PluginInstall +qall
 
   print_result $? 'Install Vim plugins'
 }
@@ -39,12 +41,12 @@ vim_update_plugins() {
     for plugin in */; do
       cd "${plugin}"
 
-      git fetch --tags &>> ~/.dotfiles.log
+      git fetch --tags 1>> ~/.dotfiles.log
 
       local tag="$(git describe --tags $(git rev-list --tags --max-count=1))"
 
       if [[ "$tag" != "" ]]; then
-        git checkout "${tag}" &>> ~/.dotfiles.log
+        git checkout "${tag}" 1>> ~/.dotfiles.log
 
         if [[ $? -eq 0 ]]; then
           printf "\n" | vim +PluginInstall +qall
